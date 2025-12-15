@@ -1,8 +1,8 @@
-import common from './ar/common'
-import nav from './ar/nav'
-import home from './ar/home'
-import footer from './ar/footer'
-import pages from './ar/pages'
+import common from './ar/common.json'
+import nav from './ar/nav.json'
+import home from './ar/home.json'
+import footer from './ar/footer.json'
+import pages from './ar/pages.json'
 
 export default defineI18nLocale(() => {
   return {
@@ -10,6 +10,6 @@ export default defineI18nLocale(() => {
     nav,
     home,
     footer,
-    pages,
+    pages
   }
 })

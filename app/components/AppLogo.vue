@@ -45,7 +45,7 @@ const _height = computed(() => {
   <NuxtLink
     class="shrink-0 block"
     :to="localePath('/')"
-    aria-label="Go to home page"
+    :aria-label="$t('accessibility.go_to_home')"
   >
     <img
       :src="logoSrc"

@@ -1,0 +1,31 @@
+{
+  "welcome": "Welcome",
+  "app": {
+    "title": "Hawkam",
+    "desc": "A marketing platform for auctions and ads"
+  },
+  "errors": {
+    "an_error_occurred": "An error occurred",
+    "unexpected_error": "An unexpected error occurred",
+    "runtime_error": "Runtime error occurred",
+    "unhandled_js_error": "Unhandled JavaScript error occurred",
+    "unhandled_promise_rejection": "Unhandled Promise Rejection",
+    "unknown": "Unknown",
+    "error": "Error",
+    "page_not_found": "Page not found",
+    "page_not_found_desc": "We are sorry but this page could not be found.",
+    "unauthenticated": "Unauthenticated",
+    "unauthenticated_desc": "You are not authenticated"
+  },
+  "loading": {
+    "loading": "Loading..."
+  },
+  "accessibility": {
+    "go_to_home": "Go to home page",
+    "close": "Close",
+    "theme_changer": "Theme changer",
+    "navbar_slideover": "Navbar SlideOver",
+    "github": "GitHub"
+  }
+}
+

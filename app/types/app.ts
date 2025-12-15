@@ -1,6 +1,5 @@
 import type { FetchOptions, ResolvedFetchOptions, ResponseType } from 'ofetch'
 import type { UseFetchOptions } from 'nuxt/app'
-import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
 
 /**
  * Base type for custom API options
@@ -26,7 +25,7 @@ export type ExtendedFetchOptions<T = unknown> = UseFetchOptions<T> & ApiCustomOp
  * Centralized API options type for useClientApi composable
  * Extends FetchOptions and adds custom options
  */
-export type ExtendedNitroFetchOptions<T = unknown> = FetchOptions & ApiCustomOptions
+export type ExtendedNitroFetchOptions<_T = unknown> = FetchOptions & ApiCustomOptions
 
 /**
  * Internal type for resolved fetch options (used in plugins)

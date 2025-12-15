@@ -1,0 +1,11 @@
+{
+  "about": {
+    "title": "About Us",
+    "description": "This is the about page. The page loading indicator should have been visible for 2 seconds while this page was loading.",
+    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+  },
+  "home": {
+    "title": "Hawkam"
+  }
+}
+

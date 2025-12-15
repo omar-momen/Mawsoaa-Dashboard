@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import * as locales from '@nuxt/ui/locale'
 
-const { locale, setLocale } = useI18n()
-
-// Handle locale change with proper persistence
-const handleLocaleChange = async (newLocale: 'ar' | 'en') => {
-  await setLocale(newLocale)
-}
+const { locale } = useI18n()
 
 // Get the Nuxt UI locale object based on current i18n locale
 const nuxtUILocale = computed(() => {
@@ -21,8 +16,8 @@ const dir = computed(() => nuxtUILocale.value?.dir || 'ltr')
 const { t } = useI18n()
 const appConfig = useAppConfig()
 
-const appTitle = computed(() => t('app.title') || 'Final Dash')
-const appDescription = computed(() => t('app.desc') || 'A production-ready starter template')
+const appTitle = computed(() => t('app.title'))
+const appDescription = computed(() => t('app.desc'))
 
 useHead({
   meta: [
@@ -64,49 +59,9 @@ useSeoMeta({
 
 <template>
   <UApp :locale="nuxtUILocale">
-    <UHeader>
-      <template #left>
-        <NuxtLink to="/">
-          <ClientOnly>
-            <AppLogo />
-          </ClientOnly>
-        </NuxtLink>
-      </template>
-
-      <template #right>
-        <UColorModeSwitch />
-        <ULocaleSelect
-          :model-value="locale"
-          :locales="[locales.ar, locales.en]"
-          class="w-48"
-          @update:model-value="handleLocaleChange($event as 'ar' | 'en')"
-        />
-      </template>
-    </UHeader>
-
-    <UMain>
+    <AppLoading />
+    <NuxtLayout>
       <NuxtPage />
-    </UMain>
-
-    <USeparator icon="i-simple-icons-nuxtdotjs" />
-
-    <UFooter>
-      <template #left>
-        <p class="text-sm text-muted">
-          {{ t('footer.copyright.made_by') }} {{ appTitle }} • © {{ new Date().getFullYear() }}
-        </p>
-      </template>
-
-      <template #right>
-        <UButton
-          :to="appConfig.app.social.github"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
-      </template>
-    </UFooter>
+    </NuxtLayout>
   </UApp>
 </template>

@@ -19,9 +19,10 @@ async function handleUnAuthenticated(response: Response) {
   const localePath = useLocalePath()
   navigateTo(localePath('/'), { redirectCode: 401 })
 
+  const { t } = useI18n()
   return useToast().add({
-    title: 'Unauthenticated',
-    description: 'You are not authenticated',
+    title: t('errors.unauthenticated'),
+    description: t('errors.unauthenticated_desc'),
     color: 'error'
   })
 }

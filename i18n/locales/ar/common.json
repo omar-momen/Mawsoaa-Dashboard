@@ -1,0 +1,31 @@
+{
+  "welcome": "مرحباً بك",
+  "app": {
+    "title": "حوكم",
+    "desc": "منصة تسويقية للمزادات والإعلانات"
+  },
+  "errors": {
+    "an_error_occurred": "حدث خطأ",
+    "unexpected_error": "حدث خطأ غير متوقع",
+    "runtime_error": "حدث خطأ في وقت التشغيل",
+    "unhandled_js_error": "حدث خطأ JavaScript غير معالج",
+    "unhandled_promise_rejection": "رفض Promise غير معالج",
+    "unknown": "غير معروف",
+    "error": "خطأ",
+    "page_not_found": "الصفحة غير موجودة",
+    "page_not_found_desc": "نأسف ولكن هذه الصفحة غير موجودة.",
+    "unauthenticated": "غير مصادق",
+    "unauthenticated_desc": "أنت غير مصادق"
+  },
+  "loading": {
+    "loading": "جاري التحميل..."
+  },
+  "accessibility": {
+    "go_to_home": "الذهاب إلى الصفحة الرئيسية",
+    "close": "إغلاق",
+    "theme_changer": "مغير السمة",
+    "navbar_slideover": "شريط التنقل المنزلق",
+    "github": "جيت هاب"
+  }
+}
+

@@ -1,11 +1,11 @@
 function getErrorMessage(error: Record<string, unknown> | string | undefined): string {
   if (!error) {
-    return useNuxtApp().$i18n?.t('an_error_occurred')
+    return useNuxtApp().$i18n?.t('errors.an_error_occurred')
   }
   if (typeof error === 'string') {
     return error
   }
-  return (error.detail || error.message || useNuxtApp().$i18n?.t('an_error_occurred')) as string
+  return (error.detail || error.message || useNuxtApp().$i18n?.t('errors.an_error_occurred')) as string
 }
 
 function formatErrorItem(error: Record<string, unknown>, index: number) {
@@ -50,5 +50,5 @@ export function extractError(data: Record<string, unknown>) {
     return data.detail as string
   }
 
-  return useNuxtApp().$i18n?.t('an_error_occurred')
+  return useNuxtApp().$i18n?.t('errors.an_error_occurred')
 }

@@ -79,6 +79,7 @@ export default defineNuxtConfig({
 
   icon: {
     size: '30px',
+    mode: 'svg',
     customCollections: [{
       prefix: 'custom',
       dir: './app/assets/icons'

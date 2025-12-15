@@ -13,7 +13,7 @@ export const useErrors = () => {
     if (typeof errorInput === 'string') {
       return errorInput
     }
-    return errorInput?.message || t('an_error_occurred') || 'An error occurred'
+    return errorInput?.message || t('errors.an_error_occurred')
   }
 
   const setError = (errorInput: ErrorInput, destination: ErrorDestination = '') => {
@@ -41,8 +41,9 @@ export const useErrors = () => {
         fatal: true
       })
     } else if (destination === 'toast') {
+      const { t } = useI18n()
       useToast().add({
-        title: 'Error',
+        title: t('errors.error'),
         description: message,
         color: 'error'
       })
