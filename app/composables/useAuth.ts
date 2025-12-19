@@ -1,5 +1,6 @@
 import type { User } from '~/types/user'
-import type { LoginResponse, LoginPayload } from '~/types/auth'
+import type { LoginPayload } from '~/types'
+import { login as loginService } from '~/services'
 
 export const useAuth = () => {
   const user = useState<User | null>('auth:user', () => null)
@@ -8,29 +9,16 @@ export const useAuth = () => {
   const isAuthenticated = computed(() => !!token.value)
 
   const login = async (payload: LoginPayload) => {
-    const { data } = await $fetch<LoginResponse>('/api/login', {
-      method: 'POST',
-      body: payload
-    })
+    const { data } = await loginService(payload.email, payload.password)
 
-    user.value = data.user
-    token.value = data.token
-  }
-
-  const logout = async () => {
-    await $fetch('/api/logout', {
-      method: 'POST'
-    })
-
-    user.value = null
-    token.value = null
+    user.value = data?.value?.data.user || null
+    token.value = data?.value?.data.token || null
   }
 
   return {
     user,
     token,
     isAuthenticated,
-    login,
-    logout
+    login
   }
 }

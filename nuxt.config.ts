@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/i18n',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    '@nuxt/image'
   ],
 
   devtools: {
@@ -38,6 +39,16 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-01-15',
+
+  typescript: {
+    typeCheck: false,
+    tsConfig: {
+      compilerOptions: {
+        module: 'esnext',
+        target: 'es2017'
+      }
+    }
+  },
 
   eslint: {
     config: {

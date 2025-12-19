@@ -13,6 +13,7 @@ alwaysApply: true
 
 ## Development Practices
 
+- **Always check Nuxt UI for components before creating custom ones** - Use the Nuxt UI MCP server to search for existing components that match your needs before implementing custom components
 - Check documentation before implementing similar functionality
 - Follow existing code patterns and conventions
 - Ensure type safety with TypeScript

@@ -10,9 +10,11 @@ type VueInstance = {
 export default defineNuxtPlugin((nuxtApp) => {
   const { setAppLoading, setPageLoading } = useLoading()
   const { setError } = useErrors()
+  const i18n = nuxtApp.$i18n as { t?: (key: string) => string }
+  const t = (key: string) => i18n?.t?.(key) || key
 
   const getFallbackMessage = () => {
-    return nuxtApp.$i18n?.t('errors.unexpected_error') || 'An unexpected error occurred'
+    return t('errors.unexpected_error') || 'An unexpected error occurred'
   }
 
   /**
@@ -75,13 +77,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       const message
         = typeof err === 'object' && err && 'message' in (err as Record<string, unknown>)
           ? String((err as { message?: unknown }).message)
-          : (nuxtApp.$i18n?.t('errors.runtime_error') || 'Runtime error occurred')
+          : (t('errors.runtime_error') || 'Runtime error occurred')
 
       const componentName
         = (instance as VueInstance)?.$options?.name
           || (instance as VueInstance)?.$type?.name
           || (instance as VueInstance)?.constructor?.name
-          || (nuxtApp.$i18n?.t('errors.unknown') || 'Unknown')
+          || (t('errors.unknown') || 'Unknown')
 
       const errorData: ErrorDetails = {
         message,
@@ -108,7 +110,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (globalThis.window !== undefined) {
     const handleGlobalError = (event: ErrorEvent) => {
       try {
-        const message = event.message || (nuxtApp.$i18n?.t('errors.unhandled_js_error') || 'Unhandled JavaScript error occurred')
+        const message = event.message || (t('errors.unhandled_js_error') || 'Unhandled JavaScript error occurred')
 
         setError(
           {
@@ -133,7 +135,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         const message
           = typeof reason === 'string'
             ? reason
-            : (reason as { message?: string })?.message || (nuxtApp.$i18n?.t('errors.unhandled_promise_rejection') || 'Unhandled Promise Rejection')
+            : (reason as { message?: string })?.message || (t('errors.unhandled_promise_rejection') || 'Unhandled Promise Rejection')
 
         setError(
           {
