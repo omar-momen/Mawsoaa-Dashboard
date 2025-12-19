@@ -59,7 +59,10 @@ useSeoMeta({
 
 <template>
   <UApp :locale="nuxtUILocale">
+    <NuxtLoadingIndicator />
+
     <AppLoading />
+
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
