@@ -1,11 +1,11 @@
 import type { FetchContext } from 'ofetch'
 import type { ExtendedResolvedFetchOptions } from '~/types'
-import { I18N_LANG } from '~/enums'
 import { extractError } from '~/utils'
 
 // Composables in plugins should be imported
 import { useLoading } from '~/composables/useLoading'
 import { useErrors } from '~/composables/useErrors'
+import { useAuthStore } from '~/stores/auth'
 
 /** handle on un-authenticated user */
 async function handleUnAuthenticated(response: Response) {
@@ -13,18 +13,20 @@ async function handleUnAuthenticated(response: Response) {
     return
   }
 
-  const { logout } = useAuth()
-  await logout()
+  const authStore = useAuthStore()
+  authStore.logout()
 
   const localePath = useLocalePath()
-  navigateTo(localePath('/'), { redirectCode: 401 })
+  const router = useRouter()
+  const currentPath = router.currentRoute.value.path
 
-  const { t } = useI18n()
-  return useToast().add({
-    title: t('errors.unauthenticated'),
-    description: t('errors.unauthenticated_desc'),
-    color: 'error'
-  })
+  // Redirect to dashboard login if accessing dashboard routes
+  if (currentPath.startsWith('/dashboard')) {
+    return router.replace(localePath('/dashboard/auth/login'))
+  }
+
+  // Otherwise redirect to home
+  return router.replace(localePath('/'))
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -41,15 +43,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       const options = ctx.options as ExtendedResolvedFetchOptions
       incrementPendingRequests()
 
-      const { token } = useAuth()
+      const authStore = useAuthStore()
       const { locale } = nuxtApp.$i18n as { locale: Ref<string> }
 
       // add headers is a key we pass to indicate that we don't want to add headers
       if (!options?.noHeaders) {
-        if (token.value) {
-          options.headers.set('Authorization', `Bearer ${token.value}`)
+        if (authStore.token) {
+          options.headers.set('Authorization', `Bearer ${authStore.token}`)
         }
-        options.headers.set('Accept-Language', I18N_LANG[locale.value as keyof typeof I18N_LANG])
+        options.headers.set('Accept-Language', locale.value)
         if (!options.headers.has('Accept')) {
           options.headers.set('Accept', 'application/json')
         }
@@ -80,7 +82,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (response?.status === 401) {
         if (!isLoginOrAuthFlow) {
           await handleUnAuthenticated(response)
-          return
         }
       }
 

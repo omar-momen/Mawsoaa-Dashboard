@@ -2,11 +2,12 @@
 alwaysApply: true
 ---
 
-# General Project Rules
+# Project Rules
 
 ## Framework & Language
 
-- Follow Nuxt 3 conventions and best practices
+- Follow Nuxt 4 conventions and best practices
+- Use Tailwind 4 for styling (via Nuxt UI)
 - Use TypeScript for type safety
 - Prefer composables over plugins when possible
 - Maintain consistency with existing code patterns
@@ -14,7 +15,46 @@ alwaysApply: true
 ## Development Practices
 
 - **Always check Nuxt UI for components before creating custom ones** - Use the Nuxt UI MCP server to search for existing components that match your needs before implementing custom components
-- Check documentation before implementing similar functionality
+- Prefer Nuxt UI components over custom implementations
+- Follow Nuxt UI theming guidelines (see `docs/CSS_TAILWIND_NUXT_UI_GUIDE.md`)
+- Check project documentation before implementing features
 - Follow existing code patterns and conventions
 - Ensure type safety with TypeScript
-- Use proper error handling patterns
+- **CRITICAL: See `docs/DEVELOPMENT_PATTERNS.md` for error handling, component organization, and styling patterns**
+- **DO NOT import Vue reactivity functions** - `ref`, `computed`, and `reactive` are auto-imported by Nuxt, just like composables and stores. Only import types from Vue (e.g., `import type { ... } from 'vue'`)
+
+## Code Organization
+
+- **Component naming**: Use directory structure (e.g., `auth/login/form.vue`), NOT kebab-case flat names (e.g., `auth-login-form.vue`)
+- Group related components in nested directories
+- Follow existing code patterns and conventions
+- Maintain consistency with project structure
+- Use established naming conventions
+
+## Error Handling
+
+- **DO NOT handle errors in individual API calls** - Global error handling is implemented in `app/plugins/api.ts` and `app/plugins/error-loading-handling.ts`
+- API errors are automatically handled and shown via toasts
+- Only handle business logic errors manually (validation, conditional flows)
+- See `docs/DEVELOPMENT_PATTERNS.md` for detailed error handling patterns
+
+## Styling
+
+- **DO NOT write CSS in components or pages** - Use Tailwind utility classes instead
+- **DO NOT use `<style>` blocks in components** - Add custom CSS to `app/assets/css/` folder following the established structure
+- Use Tailwind classes for all styling in components
+- Custom CSS should go in `app/assets/css/` (main.css, variables/, utilities.css, etc.)
+- See `docs/DEVELOPMENT_PATTERNS.md` for detailed styling patterns
+
+## Documentation
+
+**IMPORTANT: Always check the `docs/` folder for project-specific documentation, conventions, and guides before making changes or answering questions.**
+
+### Documentation Maintenance
+
+- **Always update the `docs/` folder when making code changes** - If you modify composables, utilities, patterns, stores, or conventions, update the relevant documentation files
+- Keep documentation in sync with code changes
+- Update examples and patterns in docs when implementing new features or changing existing ones
+- Document new patterns, conventions, or architectural decisions in the appropriate guide
+- See `docs/README.md` for a complete list of available documentation
+

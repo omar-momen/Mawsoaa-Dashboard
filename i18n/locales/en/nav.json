@@ -1,7 +1,8 @@
 {
   "links": {
     "home": "Home",
-    "about": "About"
+    "about": "About",
+    "dashboard": "Dashboard"
   },
   "btns": {
     "contact_us": "Contact Us"

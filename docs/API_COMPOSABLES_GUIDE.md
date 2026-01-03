@@ -1,4 +1,14 @@
-# API Composables Guide: useApi vs useClientApi
+# API Composables Guide
+
+## Table of Contents
+
+- [Overview](#overview)
+- [When to Use Each](#when-to-use-each)
+- [How to Use Each](#how-to-use-each)
+- [Key Differences](#key-differences)
+- [Examples by Scenario](#examples-by-scenario)
+- [Best Practices](#best-practices)
+- [Migration Tips](#migration-tips)
 
 ## Overview
 

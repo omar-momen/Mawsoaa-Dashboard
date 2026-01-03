@@ -1,7 +1,8 @@
 {
   "links": {
     "home": "الرئيسية",
-    "about": "من نحن"
+    "about": "من نحن",
+    "dashboard": "لوحة التحكم"
   },
   "btns": {
     "contact_us": "تواصل معنا"

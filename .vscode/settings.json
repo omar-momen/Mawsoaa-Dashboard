@@ -6,13 +6,16 @@
         "iconify",
         "lucide",
         "Mawsoaa",
+        "Momen",
         "nitropack",
         "Nuxt",
         "nuxtjs",
         "ofetch",
         "refetches",
         "rgba",
+        "Slideover",
         "svgs",
+        "tanstack",
         "vueuse"
     ],
     "files.associations": {

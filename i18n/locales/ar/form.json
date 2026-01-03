@@ -1,0 +1,14 @@
+{
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "upload_image": "رفع صورة",
+  "validation": {
+    "is_required": "مطلوب"
+  },
+  "success": {
+    "title": "نجح",
+    "created": "تم إنشاء العنصر بنجاح",
+    "updated": "تم تحديث العنصر بنجاح"
+  }
+}
+

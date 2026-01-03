@@ -1,0 +1,19 @@
+{
+  "links": {
+    "home": "Home",
+    "inbox": "Inbox",
+    "customers": "Customers",
+    "tenants": "Tenants",
+    "settings": {
+      "title": "Settings",
+      "general": "General",
+      "members": "Members",
+      "notifications": "Notifications",
+      "security": "Security"
+    },
+    "feedback": "Feedback",
+    "help_support": "Help & Support",
+    "profile": "Profile",
+    "billing": "Billing"
+  }
+}

@@ -51,9 +51,8 @@ const _height = computed(() => {
       :src="logoSrc"
       :width="width || _width"
       :height="height || _height"
-      :alt="$t('home.alt_texts.site_logo')"
+      :alt="$t('app.title')"
       v-bind="$attrs"
     >
   </NuxtLink>
 </template>
-

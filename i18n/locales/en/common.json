@@ -26,6 +26,30 @@
     "theme_changer": "Theme changer",
     "navbar_slideover": "Navbar SlideOver",
     "github": "GitHub"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "we_use_first_party_cookies": "We use first party cookies to enhance your experience. By continuing to use our website, you consent to our use of cookies.",
+    "accept": "Accept",
+    "opt_out": "Opt Out"
+  },
+  "search": {
+    "go_to": "Go to"
+  },
+  "toast": {
+    "we_use_first_party_cookies": "We use first party cookies to enhance your experience. By continuing to use our website, you consent to our use of cookies.",
+    "accept": "Accept",
+    "opt_out": "Opt Out"
+  },
+  "theme": {
+    "title": "Theme",
+    "primary": "Primary",
+    "neutral": "Neutral"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "light": "Light",
+    "dark": "Dark"
   }
 }
 

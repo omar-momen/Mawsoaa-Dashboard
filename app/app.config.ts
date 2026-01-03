@@ -1,3 +1,5 @@
+import { inputUiConfig } from './configs/ui/Input'
+
 export default defineAppConfig({
   ui: {
     colors: {
@@ -9,7 +11,9 @@ export default defineAppConfig({
       warning: 'yellow',
       error: 'red',
       neutral: 'slate'
-    }
+    },
+    input: inputUiConfig
+
   },
 
   app: {

@@ -12,13 +12,20 @@ const handleLocaleChange = async (newLocale: 'ar' | 'en') => {
 
 const { t } = useI18n()
 const route = useRoute()
+const localePath = useLocalePath()
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: t('nav.links.about'),
-    to: '/about',
+    to: localePath('/about'),
     icon: 'i-lucide-info',
     active: route.path.startsWith('/about')
+  },
+  {
+    label: t('nav.links.dashboard'),
+    to: localePath('/dashboard'),
+    icon: 'i-lucide-layout-dashboard',
+    active: route.path.startsWith('/dashboard')
   }
 ])
 </script>

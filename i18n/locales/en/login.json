@@ -1,0 +1,28 @@
+{
+  "branding": {
+      "title": "Mawsoaa",
+    "description": "Transform your learning journey with our comprehensive e-learning platform. Access courses, track progress, and achieve your educational goals.",
+    "feature1": "Interactive courses and engaging content",
+    "feature2": "Track your progress and achievements",
+    "feature3": "Learn at your own pace, anywhere, anytime"
+  },
+  "form": {
+    "title": "Welcome Back",
+    "description": "Sign in to continue your learning journey",
+    "email_label": "Email Address",
+    "email_placeholder": "Enter your email",
+    "email_invalid": "Please enter a valid email address",
+    "password_label": "Password",
+    "password_placeholder": "Enter your password",
+    "password_required": "Password is required",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot password?",
+    "submit": "Sign In",
+    "footer_text": "Don't have an account?",
+    "sign_up_link": "Sign up"
+  },
+  "success": {
+    "title": "Login Successful",
+    "description": "Welcome back! Redirecting to your dashboard..."
+  }
+}

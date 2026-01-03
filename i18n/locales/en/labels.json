@@ -1,0 +1,21 @@
+{
+  "ar": "{label} (Arabic)",
+  "en": "{label} (English)",
+
+  "id": "ID",
+  "name": "Name",
+  "email": "Email",
+  "phone": "Phone",
+  "password": "Password",
+  "domain": "Domain",
+  "status": "Status",
+  "database": "Database",
+  "domains": "Domains",
+  "active": "Active",
+  "inactive": "Inactive",
+  "created_at": "Created At",
+  "updated_at": "Updated At",
+  "tenants": "Tenants",
+  "add": "Add",
+  "edit": "Edit"
+}

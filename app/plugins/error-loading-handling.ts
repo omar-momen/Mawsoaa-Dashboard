@@ -68,38 +68,38 @@ export default defineNuxtPlugin((nuxtApp) => {
    *  -----------------------------
    */
 
-  nuxtApp.vueApp.config.errorHandler = (
-    err: unknown,
-    instance: unknown,
-    info: string
-  ) => {
-    try {
-      const message
-        = typeof err === 'object' && err && 'message' in (err as Record<string, unknown>)
-          ? String((err as { message?: unknown }).message)
-          : (t('errors.runtime_error') || 'Runtime error occurred')
+  // nuxtApp.vueApp.config.errorHandler = (
+  //   err: unknown,
+  //   instance: unknown,
+  //   info: string
+  // ) => {
+  //   try {
+  //     const message
+  //       = typeof err === 'object' && err && 'message' in (err as Record<string, unknown>)
+  //         ? String((err as { message?: unknown }).message)
+  //         : (t('errors.runtime_error') || 'Runtime error occurred')
 
-      const componentName
-        = (instance as VueInstance)?.$options?.name
-          || (instance as VueInstance)?.$type?.name
-          || (instance as VueInstance)?.constructor?.name
-          || (t('errors.unknown') || 'Unknown')
+  //     const componentName
+  //       = (instance as VueInstance)?.$options?.name
+  //         || (instance as VueInstance)?.$type?.name
+  //         || (instance as VueInstance)?.constructor?.name
+  //         || (t('errors.unknown') || 'Unknown')
 
-      const errorData: ErrorDetails = {
-        message,
-        stack: (err as Error)?.stack,
-        data: {
-          component: componentName,
-          errorInfo: info
-        }
-      }
+  //     const errorData: ErrorDetails = {
+  //       message,
+  //       stack: (err as Error)?.stack,
+  //       data: {
+  //         component: componentName,
+  //         errorInfo: info
+  //       }
+  //     }
 
-      // Send to error store (store handles the toast)
-      setError(errorData, 'toast')
-    } catch {
-      // Silently fail if error handling itself fails
-    }
-  }
+  //     // Send to error store (store handles the toast)
+  //     setError(errorData, 'toast')
+  //   } catch {
+  //     // Silently fail if error handling itself fails
+  //   }
+  // }
 
   /**
    * -----------------------------
@@ -107,59 +107,59 @@ export default defineNuxtPlugin((nuxtApp) => {
    *  -----------------------------
    */
 
-  if (globalThis.window !== undefined) {
-    const handleGlobalError = (event: ErrorEvent) => {
-      try {
-        const message = event.message || (t('errors.unhandled_js_error') || 'Unhandled JavaScript error occurred')
+  // if (globalThis.window !== undefined) {
+  //   const handleGlobalError = (event: ErrorEvent) => {
+  //     try {
+  //       const message = event.message || (t('errors.unhandled_js_error') || 'Unhandled JavaScript error occurred')
 
-        setError(
-          {
-            message,
-            stack: event.error?.stack,
-            data: {
-              filename: event.filename,
-              lineno: event.lineno,
-              colno: event.colno
-            }
-          },
-          'toast'
-        )
-      } catch {
-        // Silently fail if error handling itself fails
-      }
-    }
+  //       setError(
+  //         {
+  //           message,
+  //           stack: event.error?.stack,
+  //           data: {
+  //             filename: event.filename,
+  //             lineno: event.lineno,
+  //             colno: event.colno
+  //           }
+  //         },
+  //         'toast'
+  //       )
+  //     } catch {
+  //       // Silently fail if error handling itself fails
+  //     }
+  //   }
 
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      try {
-        const reason: unknown = event.reason
-        const message
-          = typeof reason === 'string'
-            ? reason
-            : (reason as { message?: string })?.message || (t('errors.unhandled_promise_rejection') || 'Unhandled Promise Rejection')
+  //   const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+  //     try {
+  //       const reason: unknown = event.reason
+  //       const message
+  //         = typeof reason === 'string'
+  //           ? reason
+  //           : (reason as { message?: string })?.message || (t('errors.unhandled_promise_rejection') || 'Unhandled Promise Rejection')
 
-        setError(
-          {
-            message,
-            data: {
-              type: 'promise_rejection',
-              reason
-            }
-          },
-          'toast'
-        )
-      } catch {
-        // Silently fail if error handling itself fails
-      }
-    }
+  //       setError(
+  //         {
+  //           message,
+  //           data: {
+  //             type: 'promise_rejection',
+  //             reason
+  //           }
+  //         },
+  //         'toast'
+  //       )
+  //     } catch {
+  //       // Silently fail if error handling itself fails
+  //     }
+  //   }
 
-    // Register global handlers
-    globalThis.addEventListener('error', handleGlobalError)
-    globalThis.addEventListener('unhandledrejection', handleUnhandledRejection)
+  //   // Register global handlers
+  //   globalThis.addEventListener('error', handleGlobalError)
+  //   globalThis.addEventListener('unhandledrejection', handleUnhandledRejection)
 
-    // Cleanup on unload
-    globalThis.addEventListener('beforeunload', () => {
-      globalThis.removeEventListener('error', handleGlobalError)
-      globalThis.removeEventListener('unhandledrejection', handleUnhandledRejection)
-    })
-  }
+  //   // Cleanup on unload
+  //   globalThis.addEventListener('beforeunload', () => {
+  //     globalThis.removeEventListener('error', handleGlobalError)
+  //     globalThis.removeEventListener('unhandledrejection', handleUnhandledRejection)
+  //   })
+  // }
 })

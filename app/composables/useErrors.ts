@@ -1,4 +1,5 @@
 import type { ErrorDetails } from '~/types'
+import { getTranslationFunction } from '~/utils'
 
 type ErrorInput = Partial<ErrorDetails> | string
 type ErrorDestination = 'error_page' | 'toast' | ''
@@ -8,12 +9,12 @@ export const useErrors = () => {
   const nuxtError = useError()
 
   const getErrorMessage = (errorInput: ErrorInput): string => {
-    const { t } = useI18n()
+    const t = getTranslationFunction()
 
     if (typeof errorInput === 'string') {
       return errorInput
     }
-    return errorInput?.message || t('errors.an_error_occurred')
+    return errorInput?.message || t('errors.an_error_occurred') || 'An error occurred'
   }
 
   const setError = (errorInput: ErrorInput, destination: ErrorDestination = '') => {
@@ -41,9 +42,9 @@ export const useErrors = () => {
         fatal: true
       })
     } else if (destination === 'toast') {
-      const { t } = useI18n()
+      const t = getTranslationFunction()
       useToast().add({
-        title: t('errors.error'),
+        title: t('errors.error') || 'Error',
         description: message,
         color: 'error'
       })

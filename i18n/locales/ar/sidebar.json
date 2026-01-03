@@ -1,0 +1,19 @@
+{
+  "links": {
+    "home": "الرئيسية",
+    "inbox": "الرسائل",
+    "customers": "العملاء",
+    "tenants": "العملاء",
+    "settings": {
+      "title": "الإعدادات",
+      "general": "عام",
+      "members": "الأعضاء",
+      "notifications": "الإشعارات",
+      "security": "الأمان"
+    },
+    "feedback": "التعليقات",
+    "help_support": "المساعدة والدعم",
+    "profile": "الملف الشخصي",
+    "billing": "الفواتير"
+  }
+}

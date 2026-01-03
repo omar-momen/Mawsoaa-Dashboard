@@ -1,0 +1,14 @@
+{
+  "save": "Save",
+  "cancel": "Cancel",
+  "upload_image": "Upload Image",
+  "validation": {
+    "is_required": "is required"
+  },
+  "success": {
+    "title": "Success",
+    "created": "Item created successfully",
+    "updated": "Item updated successfully"
+  }
+}
+

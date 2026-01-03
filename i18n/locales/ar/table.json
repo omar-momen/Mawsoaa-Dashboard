@@ -1,0 +1,43 @@
+{
+  "actions": {
+    "title": "الإجراءات",
+    "bulk_delete": "حذف متعدد",
+    "export": "تصدير",
+    "import": "استيراد",
+    "print": "طباعة",
+    "share": "مشاركة",
+    "download": "تحميل",
+    "add": "إضافة",
+    "show": "عرض",
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "form": {
+    "add": "إضافة عنصر",
+    "edit": "تعديل عنصر"
+  },
+  "selection": {
+    "selected_count": "تم تحديد {{count}} من {{total}} صف(صفوف).",
+    "select_all": "تحديد الكل",
+    "select_row": "تحديد الصف"
+  },
+  "accessibility": {
+    "expand": "توسيع",
+    "actions_dropdown": "قائمة الإجراءات"
+  },
+  "cells": {
+    "no_items": "لا توجد عناصر",
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "delete": {
+    "title": "حذف الصف",
+    "description": "هل أنت متأكد من حذف هذا الصف؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف",
+    "cancel": "إلغاء",
+    "success": "تم حذف الصف بنجاح",
+    "error": "فشل حذف الصف",
+    "no_id": "معرف الصف مفقود"
+  }
+}
+
