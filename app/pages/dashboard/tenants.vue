@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { CrudTableColumn, CrudTableData } from '~/types'
-import type { FormInput } from '~/types/form'
+import type { FormInput, FilterInput } from '~/types/form'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 const loading = ref(false)
-const expanded = ref<Record<number, boolean>>({})
 const rowSelection = ref<Record<string, boolean>>({})
 
 const hasPermission = (_permission: string) => {
@@ -23,13 +22,19 @@ const columns: CrudTableColumn[] = [
     custom_id: 'id'
   },
   {
-    accessorKey: 'name',
+    accessorKey: 'name.ar',
     header: t('labels.ar', { label: t('labels.name') }),
+    custom_id: 'name'
+  },
+  {
+    accessorKey: 'name.en',
+    header: t('labels.en', { label: t('labels.name') }),
     custom_id: 'name'
   },
   {
     accessorKey: 'phone',
     header: t('labels.phone')
+
   },
   {
     accessorKey: 'is_active',
@@ -55,16 +60,23 @@ const columns: CrudTableColumn[] = [
 // Form inputs configuration
 const formInputs = computed<FormInput[]>(() => [
   {
-    key: 'name',
-    label: t('labels.name'),
+    key: 'name[ar]',
+    label: t('labels.ar', { label: t('labels.name') }),
     type: 'text',
-    placeholder: t('labels.name'),
+    placeholder: t('labels.ar', { label: t('labels.name') }),
     required: true
   },
   {
-    key: 'domain',
-    label: t('labels.domain'),
+    key: 'name[en]',
+    label: t('labels.en', { label: t('labels.name') }),
     type: 'text',
+    placeholder: t('labels.en', { label: t('labels.name') }),
+    required: true
+  },
+  {
+    key: 'domains',
+    label: t('labels.domain'),
+    type: 'tags',
     placeholder: t('labels.domain'),
     required: true
   },
@@ -89,26 +101,72 @@ const formInputs = computed<FormInput[]>(() => [
     placeholder: t('labels.password')
   },
   {
-    key: 'status',
+    key: 'is_active',
+    label: t('labels.status'),
+    type: 'switch',
+    placeholder: t('labels.status')
+  }
+  // {
+  //   key: 'status',
+  //   label: t('labels.status'),
+  //   type: 'select',
+  //   placeholder: t('labels.status'),
+  //   required: true,
+  //   options: [
+  //     { label: t('labels.active'), id: 'active' },
+  //     { label: t('labels.inactive'), id: 'inactive' }
+  //   ]
+  // },
+  // {
+  //   key: 'category',
+  //   label: 'Category',
+  //   type: 'select',
+  //   placeholder: 'Select Category',
+  //   required: false,
+  //   getEndpoint: 'https://jsonplaceholder.typicode.com/users',
+  //   valueKey: 'id',
+  //   labelKey: 'name'
+  // }
+])
+
+// Filter inputs configuration
+const filterInputs = computed<FilterInput[]>(() => [
+  {
+    key: 'name',
+    label: t('labels.name'),
+    type: 'text',
+    placeholder: t('labels.name'),
+    filter_key: true
+  },
+  {
+    key: 'is_active',
     label: t('labels.status'),
     type: 'select',
     placeholder: t('labels.status'),
-    required: true,
+    clearable: true,
     options: [
-      { label: t('labels.active'), id: 'active' },
-      { label: t('labels.inactive'), id: 'inactive' }
-    ]
+      { label: t('labels.active'), id: 1 },
+      { label: t('labels.inactive'), id: 0 }
+    ],
+    filter_key: true
   },
   {
-    key: 'category',
-    label: 'Category',
-    type: 'select',
-    placeholder: 'Select Category',
-    required: false,
-    getEndpoint: 'https://jsonplaceholder.typicode.com/users',
-    valueKey: 'id',
-    labelKey: 'name'
+    key: 'search',
+    label: t('labels.search'),
+    type: 'text',
+    placeholder: t('labels.search')
   }
+
+  // Example of dynamic select:
+  // {
+  //   key: 'category',
+  //   label: 'Category',
+  //   type: 'select',
+  //   placeholder: 'Select Category',
+  //   getEndpoint: '/api/categories',
+  //   valueKey: 'id',
+  //   labelKey: 'name'
+  // }
 ])
 
 const handleShow = (row: CrudTableData) => {
@@ -149,54 +207,47 @@ const handleDownload = (rows: CrudTableData[]) => {
 </script>
 
 <template>
-  <div>
-    <div class="mb-4">
-      <h1 class="text-2xl font-bold">
-        {{ t('labels.tenants') || 'Tenants' }}
-      </h1>
-    </div>
-
-    <TableBase
-      v-model:expanded="expanded"
-      v-model:row-selection="rowSelection"
-      crud-endpoint="/api/super-admin/tenants"
-      class="w-full"
-      :expandable="true"
-      :selectable="true"
-      :columns="columns"
-      :loading="loading"
-      loading-animation="swing"
-      :form-inputs="formInputs"
-      form-title="Tenant"
-      :row-actions="{
-        show: hasPermission('tenants.show'),
-        edit: hasPermission('tenants.edit'),
-        delete: hasPermission('tenants.delete')
-      }"
-      :table-actions="{
-        add: hasPermission('tenants.create'),
-        bulkDelete: hasPermission('tenants.bulkDelete'),
-        export: hasPermission('tenants.export'),
-        import: hasPermission('tenants.import'),
-        print: hasPermission('tenants.print'),
-        share: hasPermission('tenants.share'),
-        download: hasPermission('tenants.download')
-      }"
-      @show="handleShow"
-      @edit="handleEdit"
-      @delete="handleDelete"
-      @bulk-delete="handleBulkDelete"
-      @export="handleExport"
-      @import="handleImport"
-      @print="handlePrint"
-      @share="handleShare"
-      @download="handleDownload"
-    >
-      <template #expanded="{ row }">
-        <div class="p-4 bg-elevated/50">
-          <pre>{{ row.original }}</pre>
-        </div>
-      </template>
-    </TableBase>
-  </div>
+  <TableBase
+    v-model:row-selection="rowSelection"
+    crud-endpoint="/api/super-admin/tenants"
+    class="w-full"
+    :expandable="true"
+    :selectable="true"
+    :columns="columns"
+    :loading="loading"
+    loading-animation="swing"
+    :form-inputs="formInputs"
+    :form-title="t('labels.tenant')"
+    :table-title="t('cruds.tenants.title')"
+    :filter-inputs="filterInputs"
+    :row-actions="{
+      show: hasPermission('tenants.show'),
+      edit: hasPermission('tenants.edit'),
+      delete: hasPermission('tenants.delete')
+    }"
+    :table-actions="{
+      add: hasPermission('tenants.create'),
+      bulkDelete: hasPermission('tenants.bulkDelete'),
+      export: hasPermission('tenants.export'),
+      import: hasPermission('tenants.import'),
+      print: hasPermission('tenants.print'),
+      share: hasPermission('tenants.share'),
+      download: hasPermission('tenants.download')
+    }"
+    @show="handleShow"
+    @edit="handleEdit"
+    @delete="handleDelete"
+    @bulk-delete="handleBulkDelete"
+    @export="handleExport"
+    @import="handleImport"
+    @print="handlePrint"
+    @share="handleShare"
+    @download="handleDownload"
+  >
+    <template #expanded="{ row }">
+      <div class="p-4 bg-elevated/50">
+        <pre>{{ row.original }}</pre>
+      </div>
+    </template>
+  </TableBase>
 </template>

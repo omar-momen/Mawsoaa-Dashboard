@@ -15,6 +15,31 @@ export type CustomCellProps = {
 export type CustomCellFunction = (props: CustomCellProps) => unknown
 
 /**
+ * Gets a nested value from an object using dot notation
+ * @param obj - The object to access
+ * @param path - The dot-notation path (e.g., 'name.en')
+ * @returns The value at the path or undefined
+ */
+function getNestedValue(obj: unknown, path: string): unknown {
+  if (!obj || typeof obj !== 'object') {
+    return undefined
+  }
+
+  const keys = path.split('.')
+  let current: unknown = obj
+
+  for (const key of keys) {
+    if (current && typeof current === 'object' && key in current) {
+      current = (current as Record<string, unknown>)[key]
+    } else {
+      return undefined
+    }
+  }
+
+  return current
+}
+
+/**
  * Creates custom cell renderers for table columns
  * @param UBadge - Resolved UBadge component from Nuxt UI
  * @param t - Translation function from i18n
@@ -29,8 +54,27 @@ export function createCustomCells(UBadge: Component | string, t: (key: string) =
     },
     name: ({ row, column }) => {
       const accessorKey = column?.accessorKey || 'name'
-      const nameValue = row.getValue(accessorKey)
-      return h('span', { class: 'font-bold' }, String(nameValue))
+      // Handle nested accessor keys (e.g., 'name.en', 'name.ar')
+      let nameValue: unknown
+      if (accessorKey.includes('.')) {
+        nameValue = getNestedValue(row.original, accessorKey)
+      } else {
+        nameValue = row.getValue(accessorKey)
+      }
+      // Ensure we convert to string safely, handling null/undefined/objects
+      let displayValue: string
+      if (typeof nameValue === 'string') {
+        displayValue = nameValue
+      } else if (nameValue == null) {
+        displayValue = ''
+      } else if (typeof nameValue === 'object') {
+        displayValue = ''
+      } else {
+        // At this point, nameValue is a primitive (number, boolean, etc.)
+        // Type assertion is safe here because we've already excluded objects and null
+        displayValue = String(nameValue as string | number | boolean | bigint | symbol)
+      }
+      return h('span', { class: 'font-bold' }, displayValue)
     },
     chips: ({ row, column }) => {
       const accessorKey = column?.accessorKey || 'domains'
@@ -41,13 +85,14 @@ export function createCustomCells(UBadge: Component | string, t: (key: string) =
       }
 
       return h('div', { class: 'flex flex-wrap gap-1' },
-        chipsValue.map((chip: { domain?: string, id?: number, name?: string, [key: string]: unknown }, index: number) => {
-          const label = chip.domain || chip.name || String(chip.id || index)
+        chipsValue.map((chip: { label?: string, domain?: string, id?: number, name?: string, [key: string]: unknown }, index: number) => {
+          // Prefer label property, fallback to domain, name, id, or index
+          const displayLabel = chip.label || chip.domain || chip.name || String(chip.id ?? index)
           return h(UBadge, {
             key: chip.id || index,
             color: 'neutral',
             variant: 'soft'
-          }, () => label)
+          }, () => displayLabel)
         })
       )
     },

@@ -6,6 +6,7 @@ import sidebar from './ar/sidebar.json'
 import login from './ar/login.json'
 import table from './ar/table.json'
 import labels from './ar/labels.json'
+import cruds from './ar/cruds.json'
 
 export default defineI18nLocale(() => {
   return {
@@ -16,6 +17,7 @@ export default defineI18nLocale(() => {
     sidebar,
     login,
     table,
-    labels
+    labels,
+    cruds
   }
 })

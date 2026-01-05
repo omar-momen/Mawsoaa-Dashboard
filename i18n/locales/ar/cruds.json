@@ -1,0 +1,15 @@
+{
+  "tenants": {
+    "title": "المستأجرون"
+  },
+  "users": {
+    "title": "المستخدمون"
+  },
+  "roles": {
+    "title": "الأدوار"
+  },
+  "permissions": {
+    "title": "الصلاحيات"
+  }
+}
+

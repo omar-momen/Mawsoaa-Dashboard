@@ -1,0 +1,14 @@
+{
+  "tenants": {
+    "title": "Tenants"
+  },
+  "users": {
+    "title": "Users"
+  },
+  "roles": {
+    "title": "Roles"
+  },
+  "permissions": {
+    "title": "Permissions"
+  }
+}

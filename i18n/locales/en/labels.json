@@ -15,7 +15,9 @@
   "inactive": "Inactive",
   "created_at": "Created At",
   "updated_at": "Updated At",
+  "tenant": "Tenant",
   "tenants": "Tenants",
   "add": "Add",
-  "edit": "Edit"
+  "edit": "Edit",
+  "search": "Search"
 }

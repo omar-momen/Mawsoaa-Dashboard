@@ -17,7 +17,7 @@
     "edit": "تعديل عنصر"
   },
   "selection": {
-    "selected_count": "تم تحديد {{count}} من {{total}} صف(صفوف).",
+    "selected_count": "تم تحديد {count} من {total} صف(صفوف).",
     "select_all": "تحديد الكل",
     "select_row": "تحديد الصف"
   },
@@ -38,6 +38,15 @@
     "success": "تم حذف الصف بنجاح",
     "error": "فشل حذف الصف",
     "no_id": "معرف الصف مفقود"
+  },
+  "filters": {
+    "reset": "إعادة تعيين المرشحات"
+  },
+  "select": {
+    "filter_placeholder": "تصفية..."
+  },
+  "labels": {
+    "search": "بحث"
   }
 }
 

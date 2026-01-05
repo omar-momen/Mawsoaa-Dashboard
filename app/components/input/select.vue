@@ -40,6 +40,10 @@ interface Props {
    * Whether multiple options can be selected
    */
   multiple?: boolean
+  /**
+   * Display a clear button to reset the model value
+   */
+  clear?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,8 +52,11 @@ const props = withDefaults(defineProps<Props>(), {
   searchable: true,
   valueKey: 'id',
   labelKey: 'label',
-  multiple: false
+  multiple: false,
+  clear: false
 })
+
+const { t } = useI18n()
 
 const isMultiple = computed(() => props.multiple)
 
@@ -213,6 +220,24 @@ const internalModel = computed({
     emit('change', normalized)
   }
 })
+
+// Check if there's a value to show clear button
+const hasValue = computed(() => {
+  if (isMultiple.value) {
+    return Array.isArray(internalModel.value) && internalModel.value.length > 0
+  }
+  return internalModel.value !== null && internalModel.value !== undefined
+})
+
+// Clear the value
+const handleClear = (event: Event) => {
+  event.stopPropagation()
+  if (isMultiple.value) {
+    internalModel.value = []
+  } else {
+    internalModel.value = null
+  }
+}
 </script>
 
 <template>
@@ -224,12 +249,33 @@ const internalModel = computed({
     label-key="label"
     :multiple="multiple"
     :search-input="searchable ? {
-      placeholder: 'Filter...',
+      placeholder: t('table.select.filter_placeholder'),
       icon: 'i-lucide-search'
     } : undefined"
     :loading="isLoading"
     v-bind="$attrs"
   >
+    <template
+      v-if="clear"
+      #trailing="{ ui }"
+    >
+      <div class="flex items-center gap-1">
+        <UButton
+          v-if="hasValue"
+          color="neutral"
+          variant="ghost"
+          icon="i-lucide-x"
+          size="xs"
+          square
+          :class="ui.trailingIcon()"
+          @click="handleClear"
+        />
+        <UIcon
+          name="i-lucide-chevron-down"
+          :class="ui.trailingIcon()"
+        />
+      </div>
+    </template>
     <slot />
   </USelectMenu>
 </template>

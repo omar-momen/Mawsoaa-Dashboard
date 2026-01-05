@@ -17,7 +17,7 @@
     "edit": "Edit Item"
   },
   "selection": {
-    "selected_count": "{{count}} of {{total}} row(s) selected.",
+    "selected_count": "{count} of {total} row(s) selected.",
     "select_all": "Select all",
     "select_row": "Select row"
   },
@@ -38,6 +38,15 @@
     "success": "Row deleted successfully",
     "error": "Failed to delete row",
     "no_id": "Row ID is missing"
+  },
+  "filters": {
+    "reset": "Reset Filters"
+  },
+  "select": {
+    "filter_placeholder": "Filter..."
+  },
+  "labels": {
+    "search": "Search"
   }
 }
 

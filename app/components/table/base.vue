@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { Component } from 'vue'
-import type { CrudTableColumn, CrudTableData, CrudApiResponse, CrudPaginationMeta } from '~/types'
-import type { FormInput } from '~/types/form'
-import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
-import { createCustomCells } from '~/utils'
 
-const { t } = useI18n()
+import type { CrudTableColumn, CrudTableData, CrudApiResponse, CrudPaginationMeta } from '~/types'
+
+import type { FormInput, FilterInput } from '~/types/form'
+
+import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
+
+import { createCustomCells } from '~/utils'
 
 defineOptions({
   inheritAttrs: false
 })
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   show: [row: CrudTableData]
@@ -28,7 +32,13 @@ const props = withDefaults(defineProps<{
   crudEndpoint: string
   data?: CrudTableData[]
   columns?: CrudTableColumn[]
+  formInputs?: FormInput[]
+  filterInputs?: FilterInput[]
+  formTitle?: string
+  tableTitle?: string
   sticky?: boolean
+  expandable?: boolean
+  selectable?: boolean
   rowActions?: {
     show?: boolean
     edit?: boolean
@@ -43,12 +53,14 @@ const props = withDefaults(defineProps<{
     download?: boolean
     add?: boolean
   }
-  expandable?: boolean
-  selectable?: boolean
-  formInputs?: FormInput[]
-  formTitle?: string
 }>(), {
+  formInputs: () => [],
+  formTitle: undefined,
+  tableTitle: undefined,
+  filterInputs: () => [],
   sticky: true,
+  expandable: false,
+  selectable: true,
   rowActions: () => ({
     show: true,
     edit: true,
@@ -62,47 +74,45 @@ const props = withDefaults(defineProps<{
     share: false,
     download: false,
     add: true
-  }),
-  expandable: false,
-  selectable: true,
-  formInputs: () => [],
-  formTitle: undefined
+  })
 })
 
-const expanded = defineModel<Record<string, boolean>>('expanded', { default: () => ({}) })
+const expanded = ref<Record<string, boolean>>({})
 
-// Pagination state
-const currentPage = defineModel<number>('page', { default: 1 })
+const currentPage = ref(1)
 
-// Fetch data from crudEndpoint with pagination
+const activeFilters = ref<Record<string, unknown>>({})
+const handleFilterUpdate = (filters: Record<string, unknown>) => {
+  activeFilters.value = filters
+  // Reset to first page when filters change
+  currentPage.value = 1
+}
+
 const { data: fetchedData, status, refresh: refreshTable } = await useApi<CrudApiResponse>(props.crudEndpoint, {
-  key: computed(() => `table-${props.crudEndpoint}-page-${currentPage.value}`),
+  key: computed(() => `table-${props.crudEndpoint}-page-${currentPage.value}-${JSON.stringify(activeFilters.value)}`),
   query: computed(() => ({
-    page: currentPage.value
+    page: currentPage.value,
+    ...activeFilters.value
   }))
 })
 
-// Extract pagination metadata
 const paginationMeta = computed<CrudPaginationMeta | null>(() => {
   return fetchedData.value?.meta || null
 })
 
-// Use fetched data if available, otherwise use prop data
 const tableData = computed(() => {
-  if (fetchedData.value?.data && Array.isArray(fetchedData.value?.data) && fetchedData.value?.data.length > 0) {
+  if (fetchedData.value?.data?.length) {
     return fetchedData.value?.data
   }
   return props.data || []
 })
 
-// Loading state from fetch
 const isLoading = computed(() => status.value === 'pending')
 
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 const UCheckbox = resolveComponent('UCheckbox')
 const UBadge = resolveComponent('UBadge')
-const table = useTemplateRef('table')
 
 // Custom cell functions mapped by custom_id
 const customCells = createCustomCells(UBadge as Component, t)
@@ -117,7 +127,7 @@ const handleShow = (row: CrudTableData): void => {
   emit('show', row)
 }
 const handleEdit = (row: CrudTableData): void => {
-  if (props.formInputs && props.formInputs.length > 0) {
+  if (props.formInputs?.length) {
     formMode.value = 'edit'
     currentRow.value = row
     formOpen.value = true
@@ -125,7 +135,6 @@ const handleEdit = (row: CrudTableData): void => {
     emit('edit', row)
   }
 }
-
 const handleAdd = (): void => {
   if (props.formInputs && props.formInputs.length > 0) {
     formMode.value = 'add'
@@ -155,11 +164,10 @@ const selectedRows = computed(() => {
 })
 
 const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
-  const columns: TableColumn<CrudTableData>[] = (props.columns || []) as TableColumn<CrudTableData>[]
+  const columns: TableColumn<CrudTableData>[] = (props.columns) as TableColumn<CrudTableData>[]
 
   // Check if select column already exists
   const hasSelectColumn = props.columns?.some(col => col.id === 'select')
-  // Add select column if selectable is enabled and no select column exists
   if (props.selectable && !hasSelectColumn) {
     columns.unshift({
       id: 'select',
@@ -195,7 +203,6 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
 
   // Check if expand column already exists
   const hasExpandColumn = props.columns?.some(col => col.id === 'expand')
-  // Add expand column if expandable is enabled and no expand column exists
   if (props.expandable && !hasExpandColumn) {
     columns.push({
       id: 'expand',
@@ -217,7 +224,6 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
 
   // Check if actions column already exists
   const hasActionsColumn = props.columns?.some(col => col.id === 'actions')
-  // Add actions column if rowActions are enabled and no actions column exists
   if (props.rowActions && !hasActionsColumn) {
     const actionsConfig = props.rowActions
 
@@ -241,7 +247,9 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
           items.push({
             label: t('table.actions.edit'),
             icon: 'i-lucide-edit',
-            onSelect: () => handleEdit(row.original)
+            onSelect: () => {
+              handleEdit(row.original)
+            }
           })
         }
 
@@ -283,20 +291,49 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
 
 <template>
   <div>
-    <TableHeader
-      :crud-endpoint="crudEndpoint"
-      :table-actions="tableActions"
-      :selectable="selectable"
-      :selected-count="Object.keys(rowSelection).length"
-      :total-count="paginationMeta?.total || tableData.length"
-      @bulk-delete="emit('bulkDelete', selectedRows)"
-      @export="emit('export', selectedRows)"
-      @import="emit('import', selectedRows)"
-      @print="emit('print', selectedRows)"
-      @share="emit('share', selectedRows)"
-      @download="emit('download', selectedRows)"
-      @add="handleAdd"
-    />
+    <div class="mb-4 space-y-4">
+      <!-- Title, Filters, and Header Actions Combined -->
+      <div class="flex flex-col gap-4">
+        <!-- Title and Header Actions Row -->
+        <div
+          v-if="tableTitle || (tableActions && Object.values(tableActions).some(Boolean))"
+          class="flex flex-wrap items-center justify-between gap-2"
+        >
+          <h2
+            v-if="tableTitle"
+            class="text-2xl font-semibold text-foreground"
+          >
+            {{ tableTitle }}
+          </h2>
+          <div
+            v-else
+            class="flex-1"
+          />
+
+          <TableHeader
+            :crud-endpoint="crudEndpoint"
+            :table-actions="tableActions"
+            :selectable="selectable"
+            :selected-count="Object.keys(rowSelection).length"
+            :total-count="paginationMeta?.total || tableData.length"
+            @bulk-delete="emit('bulkDelete', selectedRows)"
+            @export="emit('export', selectedRows)"
+            @import="emit('import', selectedRows)"
+            @print="emit('print', selectedRows)"
+            @share="emit('share', selectedRows)"
+            @download="emit('download', selectedRows)"
+            @add="handleAdd"
+          />
+        </div>
+
+        <!-- Filters Row -->
+        <TableFilter
+          v-if="filterInputs?.length"
+          :filters="filterInputs"
+          @update:filters="handleFilterUpdate"
+        />
+      </div>
+    </div>
 
     <UTable
       ref="table"
@@ -319,18 +356,15 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
       </template>
     </UTable>
 
-    <div
+    <UPagination
       v-if="paginationMeta"
+      v-model:page="currentPage"
       class="mt-4 flex justify-center"
-    >
-      <UPagination
-        v-model:page="currentPage"
-        :total="paginationMeta.total"
-        :items-per-page="paginationMeta.per_page"
-        :sibling-count="2"
-        show-edges
-      />
-    </div>
+      :total="paginationMeta.total"
+      :items-per-page="paginationMeta.per_page"
+      :sibling-count="2"
+      show-edges
+    />
 
     <TableRowDelete
       v-model:open="deleteModalOpen"
@@ -340,7 +374,7 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
     />
 
     <TableForm
-      v-if="formInputs && formInputs.length > 0"
+      v-if="formOpen"
       v-model:open="formOpen"
       :mode="formMode"
       :title="formTitle || (formMode === 'edit' ? t('table.form.edit') : t('table.form.add'))"

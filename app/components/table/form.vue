@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FormInput, FormProps, FormValidation } from '~/types/form'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { getNestedValue } from '~/utils/nested-keys'
 
 const props = defineProps<FormProps>()
 
@@ -13,6 +14,9 @@ const open = defineModel<boolean>('open', { default: false })
 const { t } = useI18n()
 const toast = useToast()
 
+// Delimiter regex for tags input (comma or space)
+const tagsDelimiter = /[,\s]+/
+
 // Initialize form state
 const state = reactive<Record<string, unknown>>({})
 
@@ -21,19 +25,48 @@ const initializeState = () => {
   props.inputs.forEach((input: FormInput) => {
     // In edit mode, use the value from currentRow or input.val
     if (props.mode === 'edit' && props.currentRow) {
-      const rowValue = props.currentRow[input.key]
+      // Handle nested keys (e.g., 'name[ar]' -> 'name.ar')
+      const rowValue = getNestedValue(props.currentRow, input.key) ?? props.currentRow[input.key]
       if (input.val !== undefined) {
         state[input.key] = input.val
       } else if (rowValue !== undefined && rowValue !== null) {
-        state[input.key] = rowValue
+        if (input.type === 'tags') {
+          if (Array.isArray(rowValue)) {
+            if (rowValue.length > 0 && typeof rowValue[0] === 'object' && rowValue[0] !== null) {
+              // Extract label from objects with id and label properties
+              state[input.key] = rowValue.map((item: Record<string, unknown>) => {
+                // Use label property, fallback to id or string representation
+                return String(item.label ?? item.id ?? item)
+              }).filter(Boolean)
+            } else {
+              // Already an array of strings/primitives
+              state[input.key] = rowValue.map(String).filter(Boolean)
+            }
+          } else if (typeof rowValue === 'string') {
+            state[input.key] = rowValue.split(/[,\s]+/).filter(Boolean)
+          } else {
+            state[input.key] = []
+          }
+        } else if (input.type === 'switch') {
+          // Convert 0/1 to boolean for switch component
+          state[input.key] = rowValue === 1 || rowValue === true
+        } else {
+          state[input.key] = rowValue
+        }
       } else {
-        state[input.key] = ''
+        if (input.type === 'tags') {
+          state[input.key] = []
+        } else if (input.type === 'switch') {
+          state[input.key] = false
+        } else {
+          state[input.key] = ''
+        }
       }
       return
     }
 
     // In add mode, initialize with default values
-    if (input.multiple) {
+    if (input.multiple || input.type === 'tags') {
       state[input.key] = []
     } else if (input.type === 'switch') {
       state[input.key] = false
@@ -53,7 +86,6 @@ initializeState()
 watch([() => open.value, () => props.mode, () => props.currentRow], () => {
   if (open.value) {
     initializeState()
-    console.log(state)
   }
 }, { deep: true })
 
@@ -136,6 +168,14 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
         const obj = value as Record<string, unknown>
         const val = obj.id || obj.value || value
         formData.append(key, String(val))
+      } else if (typeof value === 'boolean') {
+        // Convert boolean to 0/1 for switches
+        const input = props.inputs.find(inp => inp.key === key)
+        if (input?.type === 'switch') {
+          formData.append(key, value ? '1' : '0')
+        } else {
+          formData.append(key, String(value))
+        }
       } else if (value !== null && value !== undefined) {
         formData.append(key, String(value))
       }
@@ -193,7 +233,7 @@ const handleError = (event: { errors: FormError[] }) => {
 </script>
 
 <template>
-  <USlideover
+  <UModal
     v-model:open="open"
     :title="title"
     :ui="{ footer: 'justify-end' }"
@@ -341,6 +381,23 @@ const handleError = (event: { errors: FormError[] }) => {
               :label="input.placeholder || t('form.upload_image')"
             />
           </UFormField>
+
+          <!-- Tags Input -->
+          <UFormField
+            v-if="input.type === 'tags'"
+            :label="input.label"
+            :name="input.key"
+            :required="input.required"
+          >
+            <UInputTags
+              v-model="state[input.key] as string[]"
+              :placeholder="input.placeholder"
+              :delimiter="tagsDelimiter"
+              :add-on-blur="true"
+              :add-on-tab="true"
+              class="w-full"
+            />
+          </UFormField>
         </div>
       </UForm>
     </template>
@@ -359,5 +416,5 @@ const handleError = (event: { errors: FormError[] }) => {
         form="table-form"
       />
     </template>
-  </USlideover>
+  </UModal>
 </template>
