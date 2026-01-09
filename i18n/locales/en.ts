@@ -7,6 +7,7 @@ import login from './en/login.json'
 import table from './en/table.json'
 import labels from './en/labels.json'
 import cruds from './en/cruds.json'
+import form from './en/form.json'
 
 export default defineI18nLocale(() => {
   return {
@@ -18,6 +19,7 @@ export default defineI18nLocale(() => {
     login,
     table,
     labels,
-    cruds
+    cruds,
+    form
   }
 })

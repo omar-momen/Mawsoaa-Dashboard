@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CrudTableColumn, CrudTableData } from '~/types'
 import type { FormInput, FilterInput } from '~/types/form'
+import { emailValidation, egyptPhoneValidation } from '~/utils/form'
 
 definePageMeta({
   layout: 'dashboard'
@@ -85,14 +86,21 @@ const formInputs = computed<FormInput[]>(() => [
     label: t('labels.email'),
     type: 'email',
     placeholder: t('labels.email'),
-    required: true
+    required: true,
+    validations: [
+      emailValidation(t('form.validation.email_invalid'))
+    ]
   },
   {
     key: 'phone',
     label: t('labels.phone'),
-    type: 'tel',
+    type: 'text',
     placeholder: t('labels.phone'),
-    required: true
+    hint: '201xxxxxxxx - 01xxxxxxxx',
+    required: true,
+    validations: [
+      egyptPhoneValidation(t('form.validation.phone_invalid'))
+    ]
   },
   {
     key: 'password',

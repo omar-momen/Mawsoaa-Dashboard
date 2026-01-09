@@ -64,6 +64,7 @@ const handleAdd = () => {
       color="error"
       variant="outline"
       icon="i-lucide-trash-2"
+      :disabled="selectedCount === 0"
       @click="handleBulkDelete"
     >
       {{ t('table.actions.bulk_delete') }}

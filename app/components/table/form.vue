@@ -9,6 +9,10 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
+const formTitle = computed(() => {
+  return props.mode === 'add' ? t('form.add') + ' ' + props.title : t('form.edit') + ' ' + props.title
+})
+
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
@@ -235,7 +239,7 @@ const handleError = (event: { errors: FormError[] }) => {
 <template>
   <UModal
     v-model:open="open"
-    :title="title"
+    :title="formTitle"
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
@@ -257,6 +261,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UInput
               v-model="state[input.key] as string"
@@ -271,25 +276,12 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UInput
               v-model="state[input.key] as string"
               :placeholder="input.placeholder"
               type="email"
-            />
-          </UFormField>
-
-          <!-- Tel Input -->
-          <UFormField
-            v-if="input.type === 'tel'"
-            :label="input.label"
-            :name="input.key"
-            :required="input.required"
-          >
-            <UInput
-              v-model="state[input.key] as string"
-              :placeholder="input.placeholder"
-              type="tel"
             />
           </UFormField>
 
@@ -299,6 +291,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UInput
               v-model="state[input.key] as string"
@@ -313,6 +306,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UInputNumber
               v-model="state[input.key] as number | null"
@@ -326,6 +320,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UTextarea
               v-model="state[input.key] as string"
@@ -339,6 +334,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <USwitch v-model="state[input.key] as boolean" />
           </UFormField>
@@ -349,6 +345,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <InputSelect
               v-if="input.getEndpoint"
@@ -374,6 +371,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UFileUpload
               v-model="state[input.key] as File | null"
@@ -388,6 +386,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :label="input.label"
             :name="input.key"
             :required="input.required"
+            :hint="input.hint"
           >
             <UInputTags
               v-model="state[input.key] as string[]"

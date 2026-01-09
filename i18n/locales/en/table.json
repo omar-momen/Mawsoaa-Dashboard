@@ -39,6 +39,16 @@
     "error": "Failed to delete row",
     "no_id": "Row ID is missing"
   },
+  "bulk_delete": {
+    "title": "Bulk Delete",
+    "description": "Are you sure you want to delete {count} selected row(s)? This action cannot be undone.",
+    "confirm": "Delete Selected",
+    "cancel": "Cancel",
+    "success": "Selected rows deleted successfully",
+    "error": "Failed to delete selected rows",
+    "no_selection": "No rows selected",
+    "no_ids": "Row IDs are missing"
+  },
   "filters": {
     "reset": "Reset Filters"
   },

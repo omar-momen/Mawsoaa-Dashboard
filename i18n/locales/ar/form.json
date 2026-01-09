@@ -1,9 +1,13 @@
 {
+  "add": "إضافة",
+  "edit": "تعديل",
   "save": "حفظ",
   "cancel": "إلغاء",
   "upload_image": "رفع صورة",
   "validation": {
-    "is_required": "مطلوب"
+    "is_required": "مطلوب",
+    "email_invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+    "phone_invalid": "يرجى إدخال رقم هاتف صحيح"
   },
   "success": {
     "title": "نجح",

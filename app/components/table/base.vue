@@ -154,6 +154,20 @@ const handleDeleteSuccess = (): void => {
   deleteRow.value = null
 }
 
+// Bulk delete state
+const bulkDeleteModalOpen = ref(false)
+const handleBulkDelete = (): void => {
+  if (selectedRowIds.value.length === 0) {
+    return
+  }
+  bulkDeleteModalOpen.value = true
+}
+const handleBulkDeleteSuccess = (): void => {
+  refreshTable()
+  // Clear selection after successful deletion
+  rowSelection.value = {}
+}
+
 // Get selected rows based on rowSelection model
 const rowSelection = defineModel<Record<string, boolean>>('rowSelection', { default: () => ({}) })
 const selectedRows = computed(() => {
@@ -161,6 +175,13 @@ const selectedRows = computed(() => {
     return []
   }
   return tableData.value.filter((_, index) => rowSelection.value[index])
+})
+
+// Get selected row IDs for bulk delete
+const selectedRowIds = computed(() => {
+  return selectedRows.value
+    .map(row => row.id)
+    .filter((id): id is string | number => id !== null && id !== undefined)
 })
 
 const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
@@ -314,9 +335,9 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
             :crud-endpoint="crudEndpoint"
             :table-actions="tableActions"
             :selectable="selectable"
-            :selected-count="Object.keys(rowSelection).length"
+            :selected-count="selectedRowIds.length"
             :total-count="paginationMeta?.total || tableData.length"
-            @bulk-delete="emit('bulkDelete', selectedRows)"
+            @bulk-delete="handleBulkDelete"
             @export="emit('export', selectedRows)"
             @import="emit('import', selectedRows)"
             @print="emit('print', selectedRows)"
@@ -371,6 +392,14 @@ const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
       :row="deleteRow"
       :crud-endpoint="crudEndpoint"
       @deleted="handleDeleteSuccess"
+    />
+
+    <TableBulkDelete
+      v-if="tableActions?.bulkDelete"
+      v-model:open="bulkDeleteModalOpen"
+      :row-ids="selectedRowIds"
+      :crud-endpoint="crudEndpoint"
+      @deleted="handleBulkDeleteSuccess"
     />
 
     <TableForm

@@ -14,7 +14,9 @@ export interface FormInput {
   key: string
   label: string
   type: FormInputType
+  mask?: string
   placeholder?: string
+  hint?: string
   required?: boolean
   multiple?: boolean
   options?: FormInputOption[]

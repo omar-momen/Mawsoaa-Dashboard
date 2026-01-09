@@ -53,4 +53,3 @@ export function formatDate(date: string | Date | number | null | undefined, form
 export function formatTableDate(date: string | Date | number | null | undefined): string {
   return formatDate(date, 'PP')
 }
-

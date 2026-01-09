@@ -1,9 +1,13 @@
 {
+  "add": "Add",
+  "edit": "Edit",
   "save": "Save",
   "cancel": "Cancel",
   "upload_image": "Upload Image",
   "validation": {
-    "is_required": "is required"
+    "is_required": "is required",
+    "email_invalid": "Please enter a valid email address",
+    "phone_invalid": "Please enter a valid phone number"
   },
   "success": {
     "title": "Success",
