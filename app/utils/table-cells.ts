@@ -50,7 +50,7 @@ export function createCustomCells(UBadge: Component | string, t: (key: string) =
     id: ({ row, column }) => {
       const accessorKey = column?.accessorKey || 'id'
       const idValue = row.getValue(accessorKey)
-      return h('span', { class: 'text-center font-mono' }, `#${idValue}`)
+      return h('span', { class: 'text-center font-mono' }, `${t('labels.id_prefix')}${idValue}`)
     },
     name: ({ row, column }) => {
       const accessorKey = column?.accessorKey || 'name'

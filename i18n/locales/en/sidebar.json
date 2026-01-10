@@ -4,6 +4,7 @@
     "inbox": "Inbox",
     "customers": "Customers",
     "tenants": "Tenants",
+    "users": "Users",
     "settings": {
       "title": "Settings",
       "general": "General",
@@ -15,5 +16,9 @@
     "help_support": "Help & Support",
     "profile": "Profile",
     "billing": "Billing"
+  },
+  "actions": {
+    "new_mail": "New mail",
+    "new_customer": "New customer"
   }
 }

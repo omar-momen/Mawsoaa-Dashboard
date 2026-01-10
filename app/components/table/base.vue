@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue'
-import type { Component } from 'vue'
-
 import type { CrudTableColumn, CrudTableData, CrudApiResponse, CrudPaginationMeta } from '~/types'
 
 import type { FormInput, FilterInput } from '~/types/form'
 
-import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
-
-import { createCustomCells } from '~/utils'
+import { VueDraggableNext as Draggable } from 'vue-draggable-next'
 
 defineOptions({
   inheritAttrs: false
@@ -26,10 +21,12 @@ const emit = defineEmits<{
   print: [rows: CrudTableData[]]
   share: [rows: CrudTableData[]]
   download: [rows: CrudTableData[]]
+  reorder: [newOrder: { id: string | number, newIndex: number, oldIndex: number }[]]
 }>()
 
 const props = withDefaults(defineProps<{
   crudEndpoint: string
+  crudRoute: string
   data?: CrudTableData[]
   columns?: CrudTableColumn[]
   formInputs?: FormInput[]
@@ -39,6 +36,7 @@ const props = withDefaults(defineProps<{
   sticky?: boolean
   expandable?: boolean
   selectable?: boolean
+  draggable?: boolean
   rowActions?: {
     show?: boolean
     edit?: boolean
@@ -59,8 +57,9 @@ const props = withDefaults(defineProps<{
   tableTitle: undefined,
   filterInputs: () => [],
   sticky: true,
-  expandable: false,
+  expandable: true,
   selectable: true,
+  draggable: false,
   rowActions: () => ({
     show: true,
     edit: true,
@@ -77,7 +76,44 @@ const props = withDefaults(defineProps<{
   })
 })
 
-const expanded = ref<Record<string, boolean>>({})
+// =================== Start:: Expansion ===================
+const expanded = ref<Record<number, boolean>>({})
+const toggleRowExpanded = (rowIndex: number) => {
+  expanded.value[rowIndex] = !expanded.value[rowIndex]
+}
+// =================== End:: Expansion ===================
+
+// =================== Start:: Selection ===================
+const toggleRowSelection = (rowIndex: number) => {
+  rowSelection.value[rowIndex] = !rowSelection.value[rowIndex]
+}
+const toggleAllRowsSelection = () => {
+  const allSelected = tableData.value.every((_, index) => rowSelection.value[index])
+  tableData.value.forEach((_, index) => {
+    rowSelection.value[index] = !allSelected
+  })
+}
+
+const isAllRowsSelected = computed(() => {
+  return tableData.value.length > 0 && tableData.value.every((_, index) => rowSelection.value[index])
+})
+const isSomeRowsSelected = computed(() => {
+  return Object.values(rowSelection.value).some(Boolean) && !isAllRowsSelected.value
+})
+
+const rowSelection = defineModel<Record<string, boolean>>('rowSelection', { default: () => ({}) })
+const selectedRows = computed(() => {
+  if (!props.selectable || Object.keys(rowSelection.value).length === 0) {
+    return []
+  }
+  return tableData.value.filter((_, index) => rowSelection.value[index])
+})
+const selectedRowIds = computed(() => {
+  return selectedRows.value
+    .map(row => row.id)
+    .filter((id): id is string | number => id !== null && id !== undefined)
+})
+// =================== End::Selection ===================
 
 const currentPage = ref(1)
 
@@ -89,33 +125,48 @@ const handleFilterUpdate = (filters: Record<string, unknown>) => {
 }
 
 const { data: fetchedData, status, refresh: refreshTable } = await useApi<CrudApiResponse>(props.crudEndpoint, {
-  key: computed(() => `table-${props.crudEndpoint}-page-${currentPage.value}-${JSON.stringify(activeFilters.value)}`),
-  query: computed(() => ({
-    page: currentPage.value,
-    ...activeFilters.value
-  }))
+  key: computed(() => {
+    const filterPerPage = activeFilters.value.per_page
+    const perPageValue = filterPerPage !== undefined && filterPerPage !== null && filterPerPage !== ''
+      ? Number(filterPerPage)
+      : 10
+    return `table-${props.crudEndpoint}-page-${currentPage.value}-per-page-${perPageValue}-${JSON.stringify(activeFilters.value)}`
+  }),
+  query: computed(() => {
+    const { per_page: _, ...otherFilters } = activeFilters.value
+    const filterPerPage = activeFilters.value.per_page
+    const perPageValue = filterPerPage !== undefined && filterPerPage !== null && filterPerPage !== ''
+      ? Number(filterPerPage)
+      : undefined
+    return {
+      page: currentPage.value,
+      ...(perPageValue !== undefined && { per_page: perPageValue }),
+      ...otherFilters
+    }
+  })
+})
+
+const tableData = computed(() => {
+  if (fetchedData.value?.data?.length) {
+    return fetchedData.value.data
+  }
+  return props.data || []
 })
 
 const paginationMeta = computed<CrudPaginationMeta | null>(() => {
   return fetchedData.value?.meta || null
 })
 
-const tableData = computed(() => {
-  if (fetchedData.value?.data?.length) {
-    return fetchedData.value?.data
+// Get per_page from filters or use default from pagination meta
+const perPage = computed<number>(() => {
+  const filterPerPage = activeFilters.value.per_page
+  if (filterPerPage !== undefined && filterPerPage !== null && filterPerPage !== '') {
+    return Number(filterPerPage)
   }
-  return props.data || []
+  return paginationMeta.value?.per_page || 10
 })
 
 const isLoading = computed(() => status.value === 'pending')
-
-const UButton = resolveComponent('UButton')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
-const UBadge = resolveComponent('UBadge')
-
-// Custom cell functions mapped by custom_id
-const customCells = createCustomCells(UBadge as Component, t)
 
 // Form state
 const formOpen = ref(false)
@@ -124,7 +175,13 @@ const currentRow = ref<CrudTableData | null>(null)
 
 // Row action handler functions
 const handleShow = (row: CrudTableData): void => {
-  emit('show', row)
+  if (props.rowActions?.show) {
+    const router = useRouter()
+    const localePath = useLocalePath()
+    router.push(localePath(`/dashboard/${props.crudRoute}/show/${row.id}`))
+  } else {
+    emit('show', row)
+  }
 }
 const handleEdit = (row: CrudTableData): void => {
   if (props.formInputs?.length) {
@@ -168,221 +225,249 @@ const handleBulkDeleteSuccess = (): void => {
   rowSelection.value = {}
 }
 
-// Get selected rows based on rowSelection model
-const rowSelection = defineModel<Record<string, boolean>>('rowSelection', { default: () => ({}) })
-const selectedRows = computed(() => {
-  if (!props.selectable || Object.keys(rowSelection.value).length === 0) {
-    return []
-  }
-  return tableData.value.filter((_, index) => rowSelection.value[index])
+const tableColumns = computed<CrudTableColumn[]>(() => {
+  return props.columns ? [...props.columns] : []
 })
 
-// Get selected row IDs for bulk delete
-const selectedRowIds = computed(() => {
-  return selectedRows.value
-    .map(row => row.id)
-    .filter((id): id is string | number => id !== null && id !== undefined)
-})
+// =================== Start:: Drag and Drop ===================
+const localTableData = ref<CrudTableData[]>([...tableData.value])
 
-const tableColumns = computed<TableColumn<CrudTableData>[]>(() => {
-  const columns: TableColumn<CrudTableData>[] = (props.columns) as TableColumn<CrudTableData>[]
+// Sync local data with tableData (always sync, but only use when draggable is true)
+watch(tableData, (newData) => {
+  if (newData && newData.length > 0) {
+    localTableData.value = [...newData]
+  } else {
+    localTableData.value = []
+  }
+}, { immediate: true, deep: true })
 
-  // Check if select column already exists
-  const hasSelectColumn = props.columns?.some(col => col.id === 'select')
-  if (props.selectable && !hasSelectColumn) {
-    columns.unshift({
-      id: 'select',
-      header: ({ table }) => h(UCheckbox, {
-        'modelValue': table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value),
-        'aria-label': t('table.selection.select_all')
-      }),
-      cell: ({ row }) => h(UCheckbox, {
-        'modelValue': row.getIsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-        'aria-label': t('table.selection.select_row')
-      })
-    } as TableColumn<CrudTableData>)
+const handleDragEnd = async (_event: { oldIndex: number, newIndex: number }) => {
+  if (!props.draggable) return
+
+  // Get new order from localTableData after drag
+  const newOrder = localTableData.value.map((row, index) => ({
+    id: row.id as string | number,
+    display_order: index
+  }))
+
+  // Get pagination info
+  const page = currentPage.value
+  const perPage = paginationMeta.value?.per_page || tableData.value.length
+
+  // Prepare payload
+  const payload = {
+    orders: newOrder,
+    page,
+    per_page: perPage
   }
 
-  // =================== Handle default columns
-  // Apply custom cells to columns that have custom_id but no cell
-  columns.forEach((col) => {
-    const colAsCrud = col as CrudTableColumn
-    // Skip if column already has a cell or no custom_id
-    if (colAsCrud.cell || !colAsCrud.custom_id) {
-      return
+  // Emit reorder event (for parent components that want to handle it)
+  const oldOrder = tableData.value.map((row, index) => ({
+    id: row.id as string | number,
+    index
+  }))
+  emit('reorder', newOrder.map((item, newIndex) => {
+    const oldIndex = oldOrder.findIndex(o => o.id === item.id)
+    return {
+      id: item.id,
+      newIndex,
+      oldIndex: oldIndex >= 0 ? oldIndex : newIndex
     }
+  }))
 
-    // Get the custom cell function for this custom_id
-    const customCellFn = customCells[colAsCrud.custom_id]
-    if (customCellFn) {
-      // Apply the custom cell function with column context
-      colAsCrud.cell = props => customCellFn({ ...props, column: colAsCrud })
-    }
+  // Send to endpoint
+  await useClientApi(`${props.crudEndpoint}/reorder`, {
+    method: 'POST',
+    body: payload
   })
-
-  // Check if expand column already exists
-  const hasExpandColumn = props.columns?.some(col => col.id === 'expand')
-  if (props.expandable && !hasExpandColumn) {
-    columns.push({
-      id: 'expand',
-      cell: ({ row }) => {
-        return h(UButton, {
-          'color': 'neutral',
-          'variant': 'ghost',
-          'icon': 'i-lucide-chevron-down',
-          'square': true,
-          'aria-label': t('table.accessibility.expand'),
-          'ui': {
-            leadingIcon: ['transition-transform', row.getIsExpanded() ? 'duration-200 rotate-180' : '']
-          },
-          'onClick': () => row.toggleExpanded()
-        })
-      }
-    } as TableColumn<CrudTableData>)
-  }
-
-  // Check if actions column already exists
-  const hasActionsColumn = props.columns?.some(col => col.id === 'actions')
-  if (props.rowActions && !hasActionsColumn) {
-    const actionsConfig = props.rowActions
-
-    columns.push({
-      id: 'actions',
-      header: t('table.actions.title'),
-      cell: ({ row }) => {
-        const items: DropdownMenuItem[] = []
-
-        // Show action
-        if (actionsConfig.show) {
-          items.push({
-            label: t('table.actions.show'),
-            icon: 'i-lucide-eye',
-            onSelect: () => handleShow(row.original)
-          })
-        }
-
-        // Edit action
-        if (actionsConfig.edit) {
-          items.push({
-            label: t('table.actions.edit'),
-            icon: 'i-lucide-edit',
-            onSelect: () => {
-              handleEdit(row.original)
-            }
-          })
-        }
-
-        // Delete action
-        if (actionsConfig.delete) {
-          items.push({
-            label: t('table.actions.delete'),
-            icon: 'i-lucide-trash',
-            color: 'error',
-            onSelect: () => handleDelete(row.original)
-          })
-        }
-
-        // Don't show actions column if no actions are available
-        if (items.length === 0) {
-          return null
-        }
-
-        return h('div', { class: 'text-right' }, h(UDropdownMenu, {
-          'content': {
-            align: 'end'
-          },
-          items,
-          'aria-label': t('table.accessibility.actions_dropdown')
-        }, () => h(UButton, {
-          'icon': 'i-lucide-ellipsis-vertical',
-          'color': 'neutral',
-          'variant': 'ghost',
-          'class': 'ml-auto',
-          'aria-label': t('table.accessibility.actions_dropdown')
-        })))
-      }
-    } as TableColumn<CrudTableData>)
-  }
-
-  return columns
-})
+}
+// =================== End:: Drag and Drop ===================
 </script>
 
 <template>
   <div>
-    <div class="mb-4 space-y-4">
-      <!-- Title, Filters, and Header Actions Combined -->
-      <div class="flex flex-col gap-4">
-        <!-- Title and Header Actions Row -->
-        <div
-          v-if="tableTitle || (tableActions && Object.values(tableActions).some(Boolean))"
-          class="flex flex-wrap items-center justify-between gap-2"
-        >
-          <h2
-            v-if="tableTitle"
-            class="text-2xl font-semibold text-foreground"
-          >
-            {{ tableTitle }}
-          </h2>
-          <div
-            v-else
-            class="flex-1"
-          />
+    <TableHeader
+      :crud-endpoint="crudEndpoint"
+      :table-title="tableTitle"
+      :table-actions="tableActions"
+      :selectable="selectable"
+      :selected-count="selectedRowIds.length"
+      :total-count="paginationMeta?.total || tableData.length"
+      class="mb-4"
+      @bulk-delete="handleBulkDelete"
+      @export="emit('export', selectedRows)"
+      @import="emit('import', selectedRows)"
+      @print="emit('print', selectedRows)"
+      @share="emit('share', selectedRows)"
+      @download="emit('download', selectedRows)"
+      @add="handleAdd"
+    />
 
-          <TableHeader
-            :crud-endpoint="crudEndpoint"
-            :table-actions="tableActions"
-            :selectable="selectable"
-            :selected-count="selectedRowIds.length"
-            :total-count="paginationMeta?.total || tableData.length"
-            @bulk-delete="handleBulkDelete"
-            @export="emit('export', selectedRows)"
-            @import="emit('import', selectedRows)"
-            @print="emit('print', selectedRows)"
-            @share="emit('share', selectedRows)"
-            @download="emit('download', selectedRows)"
-            @add="handleAdd"
-          />
-        </div>
+    <TableFilter
+      :filters="filterInputs || []"
+      class="mb-4"
+      @update:filters="handleFilterUpdate"
+    />
 
-        <!-- Filters Row -->
-        <TableFilter
-          v-if="filterInputs?.length"
-          :filters="filterInputs"
-          @update:filters="handleFilterUpdate"
-        />
-      </div>
-    </div>
+    <TableLoading v-if="isLoading" />
 
-    <UTable
-      ref="table"
-      v-model:expanded="expanded"
-      v-model:row-selection="rowSelection"
-      :data="tableData"
-      :columns="columns ? tableColumns : undefined"
-      :sticky="sticky"
-      :loading="isLoading"
-      v-bind="$attrs"
+    <div
+      v-else
+      class="overflow-x-auto"
     >
-      <template
-        v-if="$slots.expanded"
-        #expanded="{ row }"
+      <table
+        ref="table"
+        class="w-full border-collapse"
+        v-bind="$attrs"
       >
-        <slot
-          name="expanded"
-          :row="row"
-        />
-      </template>
-    </UTable>
+        <thead
+          :class="[
+            'bg-muted/50',
+            sticky && 'sticky top-0 z-10'
+          ]"
+        >
+          <tr>
+            <!-- Drag Handle Column -->
+            <th
+              v-if="draggable"
+              class="px-4 py-3 text-center text-sm font-semibold text-foreground border-b border-border/30 w-12"
+            />
+            <!-- Select Column -->
+            <th
+              v-if="selectable"
+              class="px-4 py-3 text-center text-sm font-semibold text-foreground border-b border-border/30 w-12"
+            >
+              <div class="flex items-center justify-center">
+                <UCheckbox
+                  :model-value="isSomeRowsSelected ? 'indeterminate' : isAllRowsSelected"
+                  :aria-label="t('table.selection.select_all')"
+                  @update:model-value="toggleAllRowsSelection"
+                />
+              </div>
+            </th>
+
+            <!-- ...Columns -->
+            <TableColumn
+              v-for="column in tableColumns"
+              :key="column.accessorKey"
+              :column="column"
+            />
+
+            <!-- Expand Column -->
+            <th
+              v-if="expandable"
+              class="px-4 py-3 text-center text-sm font-semibold text-foreground border-b border-border/30 w-12"
+            />
+            <!-- Actions Column -->
+            <th
+              v-if="rowActions && (rowActions.show || rowActions.edit || rowActions.delete)"
+              class="px-4 py-3 text-center text-sm font-semibold text-foreground border-b border-border/30 w-12"
+            >
+              {{ t('table.actions.title') }}
+            </th>
+          </tr>
+        </thead>
+
+        <Draggable
+          v-if="draggable && tableData.length > 0"
+          v-model="localTableData"
+          tag="tbody"
+          item-key="id"
+          handle=".drag-handle"
+          @end="handleDragEnd"
+        >
+          <template
+            v-for="(row, rowIndex) in localTableData"
+            :key="row.id || rowIndex"
+          >
+            <!-- Main Row -->
+            <TableRow
+              :row="row"
+              :row-index="rowIndex"
+              :columns="tableColumns"
+              :selectable="selectable"
+              :expandable="expandable"
+              :draggable="draggable"
+              :row-actions="rowActions"
+              :crud-route="crudRoute"
+              :is-selected="rowSelection[rowIndex] || false"
+              :is-expanded="expanded[rowIndex] || false"
+              @toggle-selection="toggleRowSelection"
+              @toggle-expand="toggleRowExpanded"
+              @show="handleShow"
+              @edit="handleEdit"
+              @delete="handleDelete"
+            />
+
+            <!-- Expanded Row -->
+            <TableExpandedRow
+              v-if="expanded[rowIndex] && $slots.expanded"
+              :colspan="tableColumns.length + (draggable ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0) + (rowActions && (rowActions.show || rowActions.edit || rowActions.delete) ? 1 : 0)"
+              :row="row"
+            >
+              <template #default="{ row: expandedRow }">
+                <slot
+                  name="expanded"
+                  :row="expandedRow"
+                />
+              </template>
+            </TableExpandedRow>
+          </template>
+        </Draggable>
+
+        <tbody v-else>
+          <TableEmpty
+            v-if="tableData.length === 0"
+            :colspan="tableColumns.length + (draggable ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0) + (rowActions && (rowActions.show || rowActions.edit || rowActions.delete) ? 1 : 0)"
+          />
+
+          <template
+            v-for="(row, rowIndex) in tableData"
+            :key="row.id || rowIndex"
+          >
+            <!-- Main Row -->
+            <TableRow
+              :row="row"
+              :row-index="rowIndex"
+              :columns="tableColumns"
+              :selectable="selectable"
+              :expandable="expandable"
+              :draggable="draggable"
+              :row-actions="rowActions"
+              :crud-route="crudRoute"
+              :is-selected="rowSelection[rowIndex] || false"
+              :is-expanded="expanded[rowIndex] || false"
+              @toggle-selection="toggleRowSelection"
+              @toggle-expand="toggleRowExpanded"
+              @show="handleShow"
+              @edit="handleEdit"
+              @delete="handleDelete"
+            />
+
+            <!-- Expanded Row -->
+            <TableExpandedRow
+              v-if="expanded[rowIndex] && $slots.expanded"
+              :colspan="tableColumns.length + (draggable ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0) + (rowActions && (rowActions.show || rowActions.edit || rowActions.delete) ? 1 : 0)"
+              :row="row"
+            >
+              <template #default="{ row: expandedRow }">
+                <slot
+                  name="expanded"
+                  :row="expandedRow"
+                />
+              </template>
+            </TableExpandedRow>
+          </template>
+        </tbody>
+      </table>
+    </div>
 
     <UPagination
       v-if="paginationMeta"
       v-model:page="currentPage"
       class="mt-4 flex justify-center"
       :total="paginationMeta.total"
-      :items-per-page="paginationMeta.per_page"
+      :items-per-page="perPage"
       :sibling-count="2"
       show-edges
     />

@@ -58,7 +58,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         // const appDataStore = useAppStore()
         // if (appDataStore.appData?.key) {
-        //   options.headers.set('tenant-key', appDataStore.appData?.key || '')
+        options.headers.set('X-Tenant', 'fentora')
         // }
       }
     },

@@ -17,7 +17,14 @@
   "updated_at": "Updated At",
   "tenant": "Tenant",
   "tenants": "Tenants",
+  "user": "User",
+  "users": "Users",
+  "avatar": "Avatar",
   "add": "Add",
   "edit": "Edit",
-  "search": "Search"
+  "search": "Search",
+  "user_details": "User Details",
+  "roles": "Roles",
+  "id_prefix": "#",
+  "not_available": "-"
 }

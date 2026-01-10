@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CrudTableColumn } from '~/types'
 import type { FormInput, FilterInput } from '~/types/form'
-import { emailValidation, egyptPhoneValidation, domainValidation } from '~/utils/form'
+import { emailValidation, egyptPhoneValidation } from '~/utils/form'
 
 definePageMeta({
   layout: 'dashboard'
@@ -23,33 +23,32 @@ const columns: CrudTableColumn[] = [
     custom_id: 'id'
   },
   {
-    accessorKey: 'name.ar',
-    header: t('labels.ar', { label: t('labels.name') }),
+    accessorKey: 'avatar',
+    header: '',
+    custom_id: 'avatar'
+  },
+  {
+    accessorKey: 'name',
+    header: t('labels.name'),
     custom_id: 'name'
-  },
-  {
-    accessorKey: 'name.en',
-    header: t('labels.en', { label: t('labels.name') }),
-    custom_id: 'name'
-  },
-  {
-    accessorKey: 'phone',
-    header: t('labels.phone')
-
-  },
-  {
-    accessorKey: 'is_active',
-    header: t('labels.status'),
-    custom_id: 'is_active'
   },
   {
     accessorKey: 'email',
     header: t('labels.email')
   },
   {
-    accessorKey: 'domains',
-    header: t('labels.domains'),
+    accessorKey: 'phone',
+    header: t('labels.phone')
+  },
+  {
+    accessorKey: 'roles',
+    header: t('labels.roles'),
     custom_id: 'chips'
+  },
+  {
+    accessorKey: 'is_active',
+    header: t('labels.status'),
+    custom_id: 'is_active'
   },
   {
     accessorKey: 'created_at',
@@ -61,28 +60,11 @@ const columns: CrudTableColumn[] = [
 // Form inputs configuration
 const formInputs = computed<FormInput[]>(() => [
   {
-    key: 'name[ar]',
-    label: t('labels.ar', { label: t('labels.name') }),
+    key: 'name',
+    label: t('labels.name'),
     type: 'text',
-    placeholder: t('labels.ar', { label: t('labels.name') }),
+    placeholder: t('labels.name'),
     required: true
-  },
-  {
-    key: 'name[en]',
-    label: t('labels.en', { label: t('labels.name') }),
-    type: 'text',
-    placeholder: t('labels.en', { label: t('labels.name') }),
-    required: true
-  },
-  {
-    key: 'domains',
-    label: t('labels.domain'),
-    type: 'tags',
-    placeholder: t('labels.domain'),
-    required: true,
-    validations: [
-      domainValidation()
-    ]
   },
   {
     key: 'email',
@@ -106,10 +88,26 @@ const formInputs = computed<FormInput[]>(() => [
     ]
   },
   {
+    key: 'roles',
+    label: t('labels.roles'),
+    type: 'select',
+    placeholder: t('labels.roles'),
+    required: true,
+    multiple: true,
+    getEndpoint: 'api/helpers/tenant/select-options/roles'
+  },
+  {
     key: 'password',
     label: t('labels.password'),
     type: 'password',
     placeholder: t('labels.password')
+  },
+  {
+    key: 'avatar',
+    label: t('labels.avatar'),
+    type: 'file-image',
+    placeholder: t('form.upload_image'),
+    required: false
   },
   {
     key: 'is_active',
@@ -146,25 +144,13 @@ const filterInputs = computed<FilterInput[]>(() => [
     type: 'text',
     placeholder: t('labels.search')
   }
-
-  // Example of dynamic select:
-  // {
-  //   key: 'category',
-  //   label: 'Category',
-  //   type: 'select',
-  //   placeholder: 'Select Category',
-  //   getEndpoint: '/api/categories',
-  //   valueKey: 'id',
-  //   labelKey: 'name'
-  // }
 ])
 </script>
 
 <template>
   <TableBase
     v-model:row-selection="rowSelection"
-    crud-route="tenants"
-    crud-endpoint="/api/super-admin/tenants"
+    crud-endpoint="/api/admin/users"
     class="w-full"
     :expandable="true"
     :selectable="true"
@@ -173,22 +159,23 @@ const filterInputs = computed<FilterInput[]>(() => [
     :loading="loading"
     loading-animation="swing"
     :form-inputs="formInputs"
-    :form-title="t('labels.tenant')"
-    :table-title="t('cruds.tenants.title')"
+    :form-title="t('labels.user')"
+    :table-title="t('cruds.users.title')"
     :filter-inputs="filterInputs"
+    crud-route="users"
     :row-actions="{
-      show: hasPermission('tenants.show'),
-      edit: hasPermission('tenants.edit'),
-      delete: hasPermission('tenants.delete')
+      show: hasPermission('users.show'),
+      edit: hasPermission('users.edit'),
+      delete: hasPermission('users.delete')
     }"
     :table-actions="{
-      add: hasPermission('tenants.create'),
-      bulkDelete: hasPermission('tenants.bulkDelete'),
-      export: hasPermission('tenants.export'),
-      import: hasPermission('tenants.import'),
-      print: hasPermission('tenants.print'),
-      share: hasPermission('tenants.share'),
-      download: hasPermission('tenants.download')
+      add: hasPermission('users.create'),
+      bulkDelete: hasPermission('users.bulkDelete'),
+      export: hasPermission('users.export'),
+      import: hasPermission('users.import'),
+      print: hasPermission('users.print'),
+      share: hasPermission('users.share'),
+      download: hasPermission('users.download')
     }"
   >
     <template #expanded="{ row }">

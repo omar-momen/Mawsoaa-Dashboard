@@ -5,10 +5,16 @@
     "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
   },
   "home": {
-    "title": "Mawsoaa"
+    "title": "Mawsoaa",
+    "description": "A marketing platform for auctions and ads",
+    "get_started": "Get Started",
+    "learn_more": "Learn More"
   },
   "tenants": {
     "title": "Tenants"
+  },
+  "dashboard": {
+    "title": "Dashboard"
   }
 }
 

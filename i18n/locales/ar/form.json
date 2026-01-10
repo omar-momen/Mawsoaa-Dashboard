@@ -4,10 +4,15 @@
   "save": "حفظ",
   "cancel": "إلغاء",
   "upload_image": "رفع صورة",
+  "change_image": "تغيير الصورة",
+  "remove_image": "إزالة الصورة",
+  "phone_hint": "201xxxxxxxx - 01xxxxxxxx",
   "validation": {
     "is_required": "مطلوب",
     "email_invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
-    "phone_invalid": "يرجى إدخال رقم هاتف صحيح"
+    "phone_invalid": "يرجى إدخال رقم هاتف صحيح",
+    "domain_max_length": "يجب أن يكون كل نطاق 10 أحرف أو أقل",
+    "invalid_image": "يرجى اختيار ملف صورة صحيح"
   },
   "success": {
     "title": "نجح",

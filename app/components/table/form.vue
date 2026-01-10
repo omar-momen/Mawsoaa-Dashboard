@@ -40,7 +40,7 @@ const initializeState = () => {
               // Extract label from objects with id and label properties
               state[input.key] = rowValue.map((item: Record<string, unknown>) => {
                 // Use label property, fallback to id or string representation
-                return String(item.label ?? item.id ?? item)
+                return String(item.key ?? item.id ?? item.label ?? item)
               }).filter(Boolean)
             } else {
               // Already an array of strings/primitives
@@ -54,6 +54,11 @@ const initializeState = () => {
         } else if (input.type === 'switch') {
           // Convert 0/1 to boolean for switch component
           state[input.key] = rowValue === 1 || rowValue === true
+        } else if (input.type === 'file-image') {
+          // For file-image inputs in edit mode, don't set the URL string
+          // Leave it as null so user can upload a new file if needed
+          // The existing image URL is shown elsewhere (e.g., in the table)
+          state[input.key] = null
         } else {
           state[input.key] = rowValue
         }
@@ -62,6 +67,8 @@ const initializeState = () => {
           state[input.key] = []
         } else if (input.type === 'switch') {
           state[input.key] = false
+        } else if (input.type === 'file-image') {
+          state[input.key] = null
         } else {
           state[input.key] = ''
         }
@@ -74,7 +81,7 @@ const initializeState = () => {
       state[input.key] = []
     } else if (input.type === 'switch') {
       state[input.key] = false
-    } else if (input.type === 'number') {
+    } else if (input.type === 'number' || input.type === 'file-image') {
       state[input.key] = null
     } else {
       // All text-based inputs (text, email, tel, password, textarea) default to empty string
@@ -158,7 +165,7 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
           if (typeof item === 'object' && item !== null) {
             // Extract value from object if it's a select option
             const obj = item as Record<string, unknown>
-            const val = obj.id || obj.value || item
+            const val = obj.key || item
             formData.append(`${key}[${index}]`, String(val))
           } else {
             formData.append(`${key}[${index}]`, String(item))
@@ -170,7 +177,7 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
       } else if (typeof value === 'object' && value !== null) {
         // Handle object values (from select)
         const obj = value as Record<string, unknown>
-        const val = obj.id || obj.value || value
+        const val = obj.key || value
         formData.append(key, String(val))
       } else if (typeof value === 'boolean') {
         // Convert boolean to 0/1 for switches
@@ -223,6 +230,17 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
   } finally {
     isSaving.value = false
   }
+}
+
+// Get existing image URL for edit mode
+const getExistingImageUrl = (input: FormInput): string | null => {
+  if (props.mode === 'edit' && props.currentRow) {
+    const rowValue = getNestedValue(props.currentRow, input.key) ?? props.currentRow[input.key]
+    if (rowValue && typeof rowValue === 'string') {
+      return rowValue
+    }
+  }
+  return null
 }
 
 // Handle validation errors
@@ -351,8 +369,8 @@ const handleError = (event: { errors: FormError[] }) => {
               v-if="input.getEndpoint"
               v-model="state[input.key] as Record<string, unknown> | Record<string, unknown>[] | null"
               :url="input.getEndpoint"
-              :value-key="input.valueKey || 'id'"
-              :label-key="input.labelKey || 'label'"
+              :value-key="input.valueKey"
+              :label-key="input.labelKey"
               :multiple="input.multiple"
               :placeholder="input.placeholder"
             />
@@ -373,10 +391,11 @@ const handleError = (event: { errors: FormError[] }) => {
             :required="input.required"
             :hint="input.hint"
           >
-            <UFileUpload
+            <InputUploadImage
               v-model="state[input.key] as File | null"
-              accept="image/*"
+              :existing-image-url="getExistingImageUrl(input)"
               :label="input.placeholder || t('form.upload_image')"
+              accept="image/*"
             />
           </UFormField>
 

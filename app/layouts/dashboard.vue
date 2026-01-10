@@ -1,11 +1,18 @@
 <script setup lang="ts">
+import * as locales from '@nuxt/ui/locale'
+
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const toast = useToast()
 
 const open = ref(false)
 
-const { t } = useI18n()
+const { t, locale, setLocale } = useI18n()
+
+// Handle locale change with proper persistence
+const handleLocaleChange = async (newLocale: 'ar' | 'en') => {
+  await setLocale(newLocale)
+}
 
 const localePath = useLocalePath()
 
@@ -32,7 +39,16 @@ const links = [
     onSelect: () => {
       open.value = false
     }
-  }, {
+  },
+  {
+    label: t('sidebar.links.users'),
+    icon: 'i-lucide-users',
+    to: localePath('/dashboard/users'),
+    onSelect: () => {
+      open.value = false
+    }
+  },
+  {
     label: t('sidebar.links.settings.title'),
     to: localePath('/dashboard/settings'),
     icon: 'i-lucide-settings',
@@ -88,15 +104,18 @@ const groups = computed(() => [
 
 const { isNotificationsSlideoverOpen } = useDashboard()
 
-const items = [[{
-  label: 'New mail',
+const items = computed(() => [[{
+  label: t('sidebar.actions.new_mail'),
   icon: 'i-lucide-send',
   to: localePath('/dashboard/inbox')
-}, {
-  label: 'New customer',
+},
+{
+  label: t('sidebar.actions.new_customer'),
   icon: 'i-lucide-user-plus',
   to: localePath('/dashboard/tenants')
-}]]
+}
+]
+])
 
 onMounted(async () => {
   const cookie = useCookie('cookie-consent')
@@ -182,6 +201,13 @@ onMounted(async () => {
           </template>
 
           <template #right>
+            <UColorModeSwitch />
+            <ULocaleSelect
+              :model-value="locale"
+              :locales="[locales.ar, locales.en]"
+              class="w-48"
+              @update:model-value="handleLocaleChange($event as 'ar' | 'en')"
+            />
             <UTooltip
               :text="t('notifications.title')"
               :shortcuts="['N']"
@@ -217,7 +243,7 @@ onMounted(async () => {
         <UDashboardToolbar>
           <template #left>
             <h2>
-              Not translated title
+              {{ t('pages.dashboard.title') }}
             </h2>
           </template>
         </UDashboardToolbar>

@@ -17,8 +17,15 @@
   "updated_at": "تاريخ التحديث",
   "tenant": "مستأجر",
   "tenants": "المستأجرون",
+  "user": "مستخدم",
+  "users": "المستخدمون",
+  "avatar": "الصورة الشخصية",
   "add": "إضافة",
   "edit": "تعديل",
-  "search": "بحث"
+  "search": "بحث",
+  "user_details": "تفاصيل المستخدم",
+  "roles": "الأدوار",
+  "id_prefix": "#",
+  "not_available": "-"
 }
 

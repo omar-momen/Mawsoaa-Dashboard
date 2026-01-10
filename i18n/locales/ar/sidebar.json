@@ -3,7 +3,8 @@
     "home": "الرئيسية",
     "inbox": "الرسائل",
     "customers": "العملاء",
-    "tenants": "العملاء",
+    "tenants": "المستأجرون",
+    "users": "المستخدمون",
     "settings": {
       "title": "الإعدادات",
       "general": "عام",
@@ -15,5 +16,9 @@
     "help_support": "المساعدة والدعم",
     "profile": "الملف الشخصي",
     "billing": "الفواتير"
+  },
+  "actions": {
+    "new_mail": "بريد جديد",
+    "new_customer": "عميل جديد"
   }
 }

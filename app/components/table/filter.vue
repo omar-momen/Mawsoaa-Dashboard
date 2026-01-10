@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { FilterInput } from '~/types/form'
 
+const { t } = useI18n()
+
 const props = defineProps<{
   filters: FilterInput[]
 }>()
@@ -8,6 +10,33 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:filters': [filters: Record<string, unknown>]
 }>()
+
+// Default per_page filter
+const defaultPerPageFilter: FilterInput = {
+  key: 'per_page',
+  label: t('table.filters.per_page'),
+  type: 'select',
+  placeholder: t('table.filters.per_page'),
+  options: [
+    { label: '5', id: 5 },
+    { label: '10', id: 10 },
+    { label: '25', id: 25 },
+    { label: '50', id: 50 },
+    { label: '100', id: 100 }
+  ],
+  filter_key: false
+}
+
+// Merge default per_page filter with provided filters
+const allFilters = computed<FilterInput[]>(() => {
+  const filters = [...(props.filters || [])]
+  // Check if per_page filter already exists
+  const hasPerPageFilter = filters.some(f => f.key === 'per_page')
+  if (!hasPerPageFilter) {
+    filters.push(defaultPerPageFilter)
+  }
+  return filters
+})
 
 // Delimiter regex for tags input (comma or space)
 const tagsDelimiter = /[,\s]+/
@@ -33,7 +62,7 @@ const getDefaultValue = (filter: FilterInput): unknown => {
 
 // Function to initialize state
 const initializeState = () => {
-  props.filters.forEach((filter: FilterInput) => {
+  allFilters.value.forEach((filter: FilterInput) => {
     filterState[filter.key] = getDefaultValue(filter)
   })
 }
@@ -42,7 +71,7 @@ const initializeState = () => {
 initializeState()
 
 // Watch for filter prop changes
-watch(() => props.filters, () => {
+watch(() => allFilters.value, () => {
   initializeState()
 }, { deep: true })
 
@@ -68,7 +97,7 @@ const buildAndEmitFilters = (newState: Record<string, unknown>) => {
 
   Object.keys(newState).forEach((key) => {
     const value = newState[key]
-    const filterConfig = props.filters.find(f => f.key === key)
+    const filterConfig = allFilters.value.find(f => f.key === key)
 
     // Skip empty values
     if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
@@ -127,11 +156,11 @@ defineExpose({
 
 <template>
   <div
-    v-if="filters && filters.length > 0"
+    v-if="allFilters && allFilters.length > 0"
     class="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-border bg-elevated p-4"
   >
     <div
-      v-for="filter in filters"
+      v-for="filter in allFilters"
       :key="filter.key"
       class="flex-1 min-w-[200px]"
     >

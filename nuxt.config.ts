@@ -96,5 +96,10 @@ export default defineNuxtConfig({
       prefix: 'custom',
       dir: './app/assets/icons'
     }]
+  },
+
+  image: {
+    quality: 90,
+    format: ['webp', 'avif']
   }
 })

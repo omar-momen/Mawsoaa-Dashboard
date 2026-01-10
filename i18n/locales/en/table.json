@@ -50,13 +50,16 @@
     "no_ids": "Row IDs are missing"
   },
   "filters": {
-    "reset": "Reset Filters"
+    "reset": "Reset Filters",
+    "per_page": "Items per page"
   },
   "select": {
     "filter_placeholder": "Filter..."
   },
   "labels": {
     "search": "Search"
-  }
+  },
+  "loading": "Loading...",
+  "no_data": "No data available"
 }
 

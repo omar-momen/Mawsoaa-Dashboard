@@ -4,10 +4,15 @@
   "save": "Save",
   "cancel": "Cancel",
   "upload_image": "Upload Image",
+  "change_image": "Change Image",
+  "remove_image": "Remove Image",
+  "phone_hint": "201xxxxxxxx - 01xxxxxxxx",
   "validation": {
     "is_required": "is required",
     "email_invalid": "Please enter a valid email address",
-    "phone_invalid": "Please enter a valid phone number"
+    "phone_invalid": "Please enter a valid phone number",
+    "domain_max_length": "Each domain must be 10 characters or less",
+    "invalid_image": "Please select a valid image file"
   },
   "success": {
     "title": "Success",

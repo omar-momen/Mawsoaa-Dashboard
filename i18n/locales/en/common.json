@@ -50,6 +50,9 @@
     "title": "Appearance",
     "light": "Light",
     "dark": "Dark"
-  }
+  },
+  "back": "Back",
+  "error": "Error",
+  "error_loading_data": "Failed to load data. Please try again."
 }
 

@@ -41,6 +41,9 @@ importers:
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
+      vue-draggable-next:
+        specifier: ^2.3.0
+        version: 2.3.0(sortablejs@1.15.6)(vue@3.5.25(typescript@5.9.3))
     devDependencies:
       '@nuxt/eslint':
         specifier: ^1.10.0
@@ -5105,6 +5108,12 @@ packages:
 
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
+
+  vue-draggable-next@2.3.0:
+    resolution: {integrity: sha512-ymbY0UIwfSdg0iDN/iyNNwUrTqZ/6KbPryzsvTNXBLuDCuOBdNijSK8yynNtmiSj6RapTPQfjLGQdJrZkzBd2w==}
+    peerDependencies:
+      sortablejs: ^1.14.0
+      vue: ^3.5.17
 
   vue-eslint-parser@10.2.0:
     resolution: {integrity: sha512-CydUvFOQKD928UzZhTp4pr2vWz1L+H99t7Pkln2QSPdvmURT0MoC4wUccfCnuEaihNsu9aYYyk+bep8rlfkUXw==}
@@ -10277,8 +10286,7 @@ snapshots:
 
   smob@1.5.0: {}
 
-  sortablejs@1.15.6:
-    optional: true
+  sortablejs@1.15.6: {}
 
   source-map-js@1.2.1: {}
 
@@ -10824,6 +10832,11 @@ snapshots:
       vue: 3.5.25(typescript@5.9.3)
 
   vue-devtools-stub@0.1.0: {}
+
+  vue-draggable-next@2.3.0(sortablejs@1.15.6)(vue@3.5.25(typescript@5.9.3)):
+    dependencies:
+      sortablejs: 1.15.6
+      vue: 3.5.25(typescript@5.9.3)
 
   vue-eslint-parser@10.2.0(eslint@9.39.1(jiti@2.6.1)):
     dependencies:

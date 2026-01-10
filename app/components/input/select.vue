@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
   url: undefined,
   staticOptions: () => [],
   searchable: true,
-  valueKey: 'id',
+  valueKey: 'key',
   labelKey: 'label',
   multiple: false,
   clear: false
@@ -62,7 +62,7 @@ const isMultiple = computed(() => props.multiple)
 
 // Declarative data fetching - lazy client-side only
 const apiUrl = computed(() => props.url || '')
-const { data: fetchedData, pending: isLoading, refresh: refreshData } = await useApi<unknown>(
+const { data: fetchedData, pending: isLoading, refresh: refreshData } = await useApi<{ data: unknown[] }>(
   () => apiUrl.value,
   {
     lazy: true,
@@ -110,12 +110,13 @@ const prepareItems = (items: unknown[]): SelectItems => {
 
 // Computed items from fetched data or static options
 const computedItems = computed<SelectItems>(() => {
-  if (props.url && fetchedData.value && Array.isArray(fetchedData.value)) {
-    return prepareItems(fetchedData.value)
+  if (props.url && fetchedData.value && Array.isArray(fetchedData.value.data)) {
+    return prepareItems(fetchedData.value.data)
   }
   if (Array.isArray(props.staticOptions)) {
     return prepareItems(props.staticOptions)
   }
+
   return props.staticOptions
 })
 

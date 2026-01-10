@@ -58,13 +58,13 @@ export function setNestedValue(obj: Record<string, unknown>, key: string, value:
   // Navigate to the parent object, creating nested objects as needed
   for (let i = 0; i < keys.length - 1; i++) {
     const k = keys[i]
-    if (!(k in current) || typeof current[k] !== 'object' || current[k] === null) {
-      current[k] = {}
+    if (!(k && k in current) || typeof current[k as keyof typeof current] !== 'object' || current[k as keyof typeof current] === null) {
+      current[k!] = {}
     }
-    current = current[k] as Record<string, unknown>
+    current = current[k!] as Record<string, unknown>
   }
 
   // Set the final value
   const finalKey = keys[keys.length - 1]
-  current[finalKey] = value
+  current[finalKey as keyof typeof current] = value
 }

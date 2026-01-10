@@ -2,10 +2,12 @@
 definePageMeta({
   layout: 'dashboard'
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
   <div>
-    <h1>Dashboard</h1>
+    <h1>{{ t('pages.dashboard.title') }}</h1>
   </div>
 </template>
