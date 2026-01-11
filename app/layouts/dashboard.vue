@@ -151,15 +151,35 @@ onMounted(async () => {
       collapsible
       resizable
       class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default', header: 'my-2' }"
+      :ui="{ footer: 'lg:border-t lg:border-default', header: 'flex items-center justify-center' }"
     >
       <!-- Logo -->
-      <template #header="{ collapsed }">
+      <template
+        #header="{ collapsed }"
+      >
         <ClientOnly>
-          <AppLogo
+          <div
             v-if="!collapsed"
-            class="max-w-full"
-          />
+          >
+            <AppLogo />
+          </div>
+          <div
+            v-else
+          >
+            <NuxtLink
+              :to="localePath('/')"
+              class="block"
+              :aria-label="$t('accessibility.go_to_home')"
+            >
+              <NuxtImg
+                src="/favicon-32x32.png"
+                alt="Logo"
+                width="32"
+                height="32"
+                class="w-8 h-8"
+              />
+            </NuxtLink>
+          </div>
         </ClientOnly>
       </template>
 
@@ -242,9 +262,7 @@ onMounted(async () => {
 
         <UDashboardToolbar>
           <template #left>
-            <h2>
-              {{ t('pages.dashboard.title') }}
-            </h2>
+            <!-- Breadcrumbs -->
           </template>
         </UDashboardToolbar>
       </template>

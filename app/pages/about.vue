@@ -8,15 +8,14 @@ await new Promise(resolve => setTimeout(resolve, 2000))
 <template>
   <div class="about-page">
     <UContainer>
-      <h1 class="text-3xl font-bold mb-4">
-        {{ t('pages.about.title') }}
-      </h1>
-      <p class="text-muted mb-4">
-        {{ t('pages.about.description') }}
-      </p>
-      <p class="text-muted">
-        {{ t('pages.about.content') }}
-      </p>
+      <div class="flex flex-col items-center justify-center text-center space-y-8">
+        <h1 class="h1">
+          {{ t('pages.about.title') }}
+        </h1>
+        <p class="para max-w-2xl">
+          {{ t('pages.about.description') }}
+        </p>
+      </div>
     </UContainer>
   </div>
 </template>

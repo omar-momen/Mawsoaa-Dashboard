@@ -2,8 +2,8 @@
 import { useWindowSize } from '@vueuse/core'
 
 defineProps<{
-  width?: string
-  height?: string
+  width?: string | number
+  height?: string | number
 }>()
 
 defineOptions({
@@ -27,32 +27,33 @@ const logoSrc = computed(() => {
   return `/logo/logo-web-${theme}.png`
 })
 
-// Responsive logo dimensions
+// Responsive logo dimensions - adjusted for sidebar context
 const _width = computed(() => {
-  if (isMobile.value) return 100
-  if (isTablet.value) return 150
-  return 200
+  if (isMobile.value) return 120
+  if (isTablet.value) return 160
+  return 180
 })
 
 const _height = computed(() => {
-  if (isMobile.value) return 30
-  if (isTablet.value) return 45
-  return 50
+  if (isMobile.value) return 36
+  if (isTablet.value) return 48
+  return 54
 })
 </script>
 
 <template>
   <NuxtLink
-    class="shrink-0 block"
+    class="shrink-0 block transition-opacity duration-200 hover:opacity-80"
     :to="localePath('/')"
     :aria-label="$t('accessibility.go_to_home')"
   >
-    <img
+    <NuxtImg
       :src="logoSrc"
       :width="width || _width"
       :height="height || _height"
       :alt="$t('app.title')"
+      class="h-auto w-full object-contain"
       v-bind="$attrs"
-    >
+    />
   </NuxtLink>
 </template>

@@ -8,6 +8,8 @@ const { t } = useI18n()
 
 <template>
   <div>
-    <h1>{{ t('pages.dashboard.title') }}</h1>
+    <h1 class="h1">
+      {{ t('pages.dashboard.title') }}
+    </h1>
   </div>
 </template>

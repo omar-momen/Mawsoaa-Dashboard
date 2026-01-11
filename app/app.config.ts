@@ -22,7 +22,8 @@ export default defineAppConfig({
       twitterCard: 'summary_large_image' as const
     },
     social: {
-      github: 'https://github.com/nuxt-ui-templates/starter'
-    }
+      facebook: 'https://www.facebook.com/omarmomen2369'
+    },
+    author: 'Omar Momen'
   }
 })

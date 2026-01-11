@@ -4,7 +4,9 @@
 
     <UMain class="relative">
       <AppPageLoading />
-      <slot />
+      <div class="py-10">
+        <slot />
+      </div>
     </UMain>
 
     <USeparator icon="i-simple-icons-nuxtdotjs" />

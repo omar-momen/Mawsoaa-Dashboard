@@ -2,7 +2,7 @@
   "welcome": "مرحباً بك",
   "app": {
     "title": "موسوعة",
-    "desc": "منصة تسويقية للمزادات والإعلانات"
+    "desc": "منصة تعليمية للطلاب"
   },
   "errors": {
     "an_error_occurred": "حدث خطأ",
@@ -25,7 +25,7 @@
     "close": "إغلاق",
     "theme_changer": "مغير السمة",
     "navbar_slideover": "شريط التنقل المنزلق",
-    "github": "جيت هاب"
+    "facebook": "فيسبوك"
   },
   "notifications": {
     "title": "الإشعارات",

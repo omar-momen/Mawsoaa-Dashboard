@@ -2,7 +2,7 @@
   "welcome": "Welcome",
   "app": {
     "title": "Mawsoaa",
-    "desc": "A marketing platform for auctions and ads"
+    "desc": "An E-Learning platform for students"
   },
   "errors": {
     "an_error_occurred": "An error occurred",
@@ -25,7 +25,7 @@
     "close": "Close",
     "theme_changer": "Theme changer",
     "navbar_slideover": "Navbar SlideOver",
-    "github": "GitHub"
+    "facebook": "Facebook"
   },
   "notifications": {
     "title": "Notifications",

@@ -20,6 +20,7 @@
   /* Here we are overriding the default colors for the Nuxt-UI components */
   --ui-bg: var(--color-bg-main);
   --ui-container: 1450px;
+  --ui-header-height: 80px;
 }
 
 :root.dark {

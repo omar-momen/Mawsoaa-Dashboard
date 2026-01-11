@@ -31,7 +31,10 @@ const items = computed<NavigationMenuItem[]>(() => [
 </script>
 
 <template>
-  <UHeader toggle-side="right">
+  <UHeader
+    toggle-side="right"
+    :ui="{ right: 'flex gap-4' }"
+  >
     <template #left>
       <ClientOnly>
         <AppLogo />
@@ -41,13 +44,12 @@ const items = computed<NavigationMenuItem[]>(() => [
     <UNavigationMenu :items="items" />
 
     <template #right>
-      <UColorModeSwitch />
       <ULocaleSelect
         :model-value="locale"
         :locales="[locales.ar, locales.en]"
-        class="w-48"
         @update:model-value="handleLocaleChange($event as 'ar' | 'en')"
       />
+      <UColorModeSwitch />
     </template>
 
     <template #body>
