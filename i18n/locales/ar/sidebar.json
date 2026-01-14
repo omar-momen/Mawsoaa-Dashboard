@@ -15,7 +15,8 @@
     "feedback": "التعليقات",
     "help_support": "المساعدة والدعم",
     "profile": "الملف الشخصي",
-    "billing": "الفواتير"
+    "billing": "الفواتير",
+    "logout": "تسجيل الخروج"
   },
   "actions": {
     "new_mail": "بريد جديد",

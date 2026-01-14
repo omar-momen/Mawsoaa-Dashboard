@@ -15,7 +15,8 @@
     "feedback": "Feedback",
     "help_support": "Help & Support",
     "profile": "Profile",
-    "billing": "Billing"
+    "billing": "Billing",
+    "logout": "Logout"
   },
   "actions": {
     "new_mail": "New mail",

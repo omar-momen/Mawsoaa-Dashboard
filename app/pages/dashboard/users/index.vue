@@ -143,6 +143,15 @@ const filterInputs = computed<FilterInput[]>(() => [
     label: t('labels.search'),
     type: 'text',
     placeholder: t('labels.search')
+  },
+  {
+    key: 'role',
+    label: t('labels.roles'),
+    type: 'select',
+    placeholder: t('labels.roles'),
+    clearable: true,
+    getEndpoint: 'api/helpers/tenant/select-options/roles',
+    filter_key: true
   }
 ])
 </script>

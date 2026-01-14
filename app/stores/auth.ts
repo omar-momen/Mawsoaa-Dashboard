@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { User } from '~/types/user'
 import type { LoginPayload } from '~/types'
-import { login as loginService } from '~/services'
+import { login as loginService, logout as logoutService } from '~/services'
 
 export const useAuthStore = defineStore('auth', () => {
   // Persistent token storage using cookies
@@ -27,12 +27,22 @@ export const useAuthStore = defineStore('auth', () => {
     tokenCookie.value = token.value
   }
 
-  function logout() {
+  async function logout() {
+    const { error } = await logoutService()
+    if (error.value) {
+      return
+    }
+
+    // Clear auth state
     user.value = null
     token.value = null
 
     // Clear cookies
     tokenCookie.value = null
+
+    const localePath = useLocalePath()
+    const router = useRouter()
+    await router.replace(localePath('/dashboard/auth/login'))
   }
 
   return {

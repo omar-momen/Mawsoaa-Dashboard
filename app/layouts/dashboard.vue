@@ -16,89 +16,86 @@ const handleLocaleChange = async (newLocale: 'ar' | 'en') => {
 
 const localePath = useLocalePath()
 
-const links = [
-  [{
-    label: t('sidebar.links.home'),
-    icon: 'i-lucide-house',
-    to: localePath('dashboard'),
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: t('sidebar.links.inbox'),
-    icon: 'i-lucide-inbox',
-    to: localePath('/dashboard/inbox'),
-    badge: '4',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: t('sidebar.links.tenants'),
-    icon: 'i-lucide-users',
-    to: localePath('/dashboard/tenants'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
-    label: t('sidebar.links.users'),
-    icon: 'i-lucide-users',
-    to: localePath('/dashboard/users'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
-    label: t('sidebar.links.settings.title'),
-    to: localePath('/dashboard/settings'),
-    icon: 'i-lucide-settings',
-    defaultOpen: true,
-    type: 'trigger',
-    children: [{
-      label: t('sidebar.links.settings.general'),
+const links = computed(() => [
+  [
+    {
+      label: t('sidebar.links.home'),
+      icon: 'i-lucide-house',
+      to: localePath('dashboard'),
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: t('sidebar.links.inbox'),
+      icon: 'i-lucide-inbox',
+      to: localePath('/dashboard/inbox'),
+      badge: '4',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: t('sidebar.links.tenants'),
+      icon: 'i-lucide-users',
+      to: localePath('/dashboard/tenants'),
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: t('sidebar.links.users'),
+      icon: 'i-lucide-users',
+      to: localePath('/dashboard/users'),
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: t('sidebar.links.settings.title'),
       to: localePath('/dashboard/settings'),
-      exact: true,
-      onSelect: () => {
-        open.value = false
-      }
-    }, {
-      label: t('sidebar.links.settings.members'),
-      to: localePath('/dashboard/settings/members'),
-      onSelect: () => {
-        open.value = false
-      }
-    }, {
-      label: t('sidebar.links.settings.notifications'),
-      to: localePath('/dashboard/settings/notifications'),
-      onSelect: () => {
-        open.value = false
-      }
-    }, {
-      label: t('sidebar.links.settings.security'),
-      to: localePath('/dashboard/settings/security'),
-      onSelect: () => {
-        open.value = false
-      }
-    }]
-  }],
-  [{
-    label: t('sidebar.links.feedback'),
-    icon: 'i-lucide-message-circle',
-    to: 'https://github.com/nuxt-ui-templates/dashboard',
-    target: '_blank'
-  }, {
-    label: t('sidebar.links.help_support'),
-    icon: 'i-lucide-info',
-    to: 'https://github.com/nuxt-ui-templates/dashboard',
-    target: '_blank'
-  }]
-] satisfies NavigationMenuItem[][]
+      icon: 'i-lucide-settings',
+      defaultOpen: true,
+      type: 'trigger',
+      children: [
+        {
+          label: t('sidebar.links.settings.general'),
+          to: localePath('/dashboard/settings'),
+          exact: true,
+          onSelect: () => {
+            open.value = false
+          }
+        },
+        {
+          label: t('sidebar.links.settings.security'),
+          to: localePath('/dashboard/settings/security'),
+          onSelect: () => {
+            open.value = false
+          }
+        }]
+    }
+  ],
+  [
+    {
+      label: t('sidebar.links.feedback'),
+      icon: 'i-lucide-message-circle',
+      to: 'https://github.com/nuxt-ui-templates/dashboard',
+      target: '_blank'
+    },
+    {
+      label: t('sidebar.links.help_support'),
+      icon: 'i-lucide-info',
+      to: 'https://github.com/nuxt-ui-templates/dashboard',
+      target: '_blank'
+    }
+  ]
+] satisfies NavigationMenuItem[][])
 
 const groups = computed(() => [
   {
     id: 'links',
     label: t('search.go_to'),
-    items: links.flat()
+    items: links.value.flat()
   }
 ])
 
@@ -269,7 +266,6 @@ onMounted(async () => {
 
       <template #body>
         <AppPageLoading />
-
         <slot />
       </template>
     </UDashboardPanel>

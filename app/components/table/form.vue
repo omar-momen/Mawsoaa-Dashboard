@@ -31,6 +31,7 @@ const initializeState = () => {
     if (props.mode === 'edit' && props.currentRow) {
       // Handle nested keys (e.g., 'name[ar]' -> 'name.ar')
       const rowValue = getNestedValue(props.currentRow, input.key) ?? props.currentRow[input.key]
+
       if (input.val !== undefined) {
         state[input.key] = input.val
       } else if (rowValue !== undefined && rowValue !== null) {
@@ -40,7 +41,7 @@ const initializeState = () => {
               // Extract label from objects with id and label properties
               state[input.key] = rowValue.map((item: Record<string, unknown>) => {
                 // Use label property, fallback to id or string representation
-                return String(item.key ?? item.id ?? item.label ?? item)
+                return String(item.label)
               }).filter(Boolean)
             } else {
               // Already an array of strings/primitives
@@ -93,6 +94,7 @@ const initializeState = () => {
 // Initialize state on mount
 initializeState()
 
+console.log(state)
 // Reset and reinitialize state when modal opens or mode/row changes
 watch([() => open.value, () => props.mode, () => props.currentRow], () => {
   if (open.value) {
@@ -139,7 +141,7 @@ const isSaving = ref(false)
 // Handle form submission
 const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) => {
   isSaving.value = true
-
+  console.log(state)
   try {
     const formData = new FormData()
 
@@ -165,7 +167,7 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
           if (typeof item === 'object' && item !== null) {
             // Extract value from object if it's a select option
             const obj = item as Record<string, unknown>
-            const val = obj.key || item
+            const val = obj.id
             formData.append(`${key}[${index}]`, String(val))
           } else {
             formData.append(`${key}[${index}]`, String(item))
@@ -177,7 +179,7 @@ const handleSubmit = async (_event: FormSubmitEvent<Record<string, unknown>>) =>
       } else if (typeof value === 'object' && value !== null) {
         // Handle object values (from select)
         const obj = value as Record<string, unknown>
-        const val = obj.key || value
+        const val = obj.id
         formData.append(key, String(val))
       } else if (typeof value === 'boolean') {
         // Convert boolean to 0/1 for switches
@@ -365,6 +367,7 @@ const handleError = (event: { errors: FormError[] }) => {
             :required="input.required"
             :hint="input.hint"
           >
+            {{ state[input.key] }}
             <InputSelect
               v-if="input.getEndpoint"
               v-model="state[input.key] as Record<string, unknown> | Record<string, unknown>[] | null"

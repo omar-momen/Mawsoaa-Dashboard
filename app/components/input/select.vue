@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
   url: undefined,
   staticOptions: () => [],
   searchable: true,
-  valueKey: 'key',
+  valueKey: 'id',
   labelKey: 'label',
   multiple: false,
   clear: false
