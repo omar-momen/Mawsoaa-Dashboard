@@ -37,8 +37,8 @@ jobs:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
-          source: output.zip
-          target: /var/www/superadmin/
+          source: "output.zip"
+          target: "/var/www/superadmin/"
 
       - name: Restart PM2
         uses: appleboy/ssh-action@v1.0.3
@@ -47,6 +47,19 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
+            set -e
+
+            # ensure unzip exists
+            command -v unzip >/dev/null 2>&1 || sudo apt install unzip -y
+
             cd /var/www/superadmin
+
+            test -f output.zip || { echo "output.zip not found"; exit 1; }
+
             unzip -o output.zip
-            pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
+
+            test -f .output/server/index.mjs || { echo ".output/server/index.mjs not found after unzip"; exit 1; }
+
+            pm2 restart superadmin-dev || pm2 start /var/www/superadmin/.output/server/index.mjs --name "superadmin-dev"
+
+            pm2 save
