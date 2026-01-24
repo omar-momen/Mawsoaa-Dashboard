@@ -47,6 +47,9 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
+            set -e
             cd /var/www/superadmin
+            test -f output.zip || { echo "output.zip not found"; exit 1; }
             unzip -o output.zip
-            pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
+            test -f .output/server/index.mjs || { echo ".output/server/index.mjs not found after unzip"; exit 1; }
+            pm2 restart superadmin-dev || pm2 start /var/www/superadmin/.output/server/index.mjs --name "superadmin-dev"
