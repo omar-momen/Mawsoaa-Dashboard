@@ -9,38 +9,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
 
-    - name: Install Dependencies
-      run: pnpm install
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
 
-    - name: Build
-      run: pnpm build
+      - name: Install Dependencies
+        run: pnpm install
 
-    - name: Zip Output
-      run: zip -r output.zip .output
+      - name: Build
+        run: pnpm build
 
-    - name: Upload to Server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USER }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        source: output.zip
-        target: /var/www/superadmin/
+      - name: Zip Output
+        run: zip -r output.zip .output
 
-    - name: Restart PM2
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USER }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        script: |
-          cd /var/www/superadmin
-          unzip -o output.zip
-          pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
+      - name: Upload to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          source: output.zip
+          target: /var/www/superadmin/
+
+      - name: Restart PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /var/www/superadmin
+            unzip -o output.zip
+            pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
