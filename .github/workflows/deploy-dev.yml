@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-      - name: Upload Full Project to Server
+      # Upload full project (excluding node_modules via default .gitignore)
+      - name: Upload Project to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEV_HOST }}
@@ -19,28 +21,39 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           source: "."
           target: "/var/www/superadmin/"
+          rm: false
 
-      - name: SSH & Build on Server
+      - name: Build & Restart on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
+          timeout: 20m
           script: |
+            set -e
+
+            echo "🔧 Navigating to project directory..."
             cd /var/www/superadmin
 
-            # Install dependencies (prod only if you prefer)
-            pnpm install --frozen-lockfile
+            echo "🧹 Cleaning previous build output..."
+            rm -rf .output
 
-            # Build Nuxt on the server
+            echo "📦 Installing production dependencies..."
+            pnpm install --prod --frozen-lockfile
+
+            echo "⚙️ Building Nuxt project..."
             pnpm build
 
-            # Start or restart PM2 app
+            echo "🚀 Starting or restarting PM2 app..."
             pm2 describe superadmin-dev > /dev/null 2>&1
             if [ $? -eq 0 ]; then
               pm2 restart superadmin-dev
             else
-              pm2 start .output/server/index.mjs --name superadmin-dev
+              pm2 start .output/server/index.mjs --name="superadmin-dev"
             fi
 
+            echo "💾 Saving PM2 process list..."
             pm2 save
+
+            echo "🎉 Deployment completed successfully!"
