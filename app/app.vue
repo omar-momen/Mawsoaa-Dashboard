@@ -38,7 +38,7 @@ useHead({
     { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }
 
     // Safari pinned tab
-    // { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#5bbad5' },
+    // { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#f00' },
   ],
   htmlAttrs: {
     lang,
