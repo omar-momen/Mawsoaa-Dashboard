@@ -1,4 +1,4 @@
-name: Deploy Backend Dev
+name: Deploy Dev Frontend
 
 on:
   push:
@@ -9,86 +9,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Pull repository code
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2) Install ZIP tool on GitHub runner
-      - name: Install Zip
-        run: sudo apt-get install zip -y
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
 
-      # 3) Create backend.zip excluding unwanted files
-      - name: Zip Backend
-        run: zip -r backend.zip . -x "vendor/*" ".git/*" ".github/*"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
 
-      # 4) Debug: show workspace files
-      - name: Debug workspace files
-        run: ls -la .
+      - name: Install Dependencies
+        run: pnpm install
 
-      # 5) Upload backend.zip → server
-      - name: Upload Backend Zip
+      - name: Build
+        run: pnpm build
+
+      - name: Zip Output
+        run: zip -r output.zip .output
+
+      - name: Upload to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.DEV_USER }}   # MUST be root
+          username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
-          source: "./backend.zip"
-          target: "/var/www/backend/"
-          strip_components: 0
-          overwrite: true
+          source: output.zip
+          target: /var/www/superadmin/
 
-      # 6) Debug: check if file is on server
-      - name: Check server folder
+      - name: Restart PM2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
-            echo "Files in /var/www/backend:"
-            ls -la /var/www/backend
-
-      # 7) Deploy backend on server
-      - name: Deploy Backend on Server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.DEV_USER }}   # root
-          key: ${{ secrets.DEV_SSH_KEY }}
-          script: |
-            set -e
-
-            cd /var/www/backend
-
-            # Ensure unzip exists
-            command -v unzip >/dev/null 2>&1 || sudo apt install unzip -y
-
-            # Check zip file
-            if [ ! -f backend.zip ]; then
-              echo "backend.zip NOT found on server — SCP failed"
-              exit 1
-            fi
-
-            # Delete everything except storage/
-            find . -mindepth 1 -maxdepth 1 ! -name storage -exec rm -rf {} +
-
-            # Extract new source
-            unzip -o backend.zip
-            rm backend.zip
-
-            # Install Laravel dependencies
-            composer install --no-dev --prefer-dist
-
-            # Laravel framework setup
-            cp .env.example .env || true
-            php artisan key:generate || true
-            php artisan config:cache
-            php artisan route:cache
-            php artisan migrate --force
-
-            # Fix permissions
-            sudo chown -R www-data:www-data /var/www/backend
-            sudo chmod -R 755 /var/www/backend/storage
-            sudo chmod -R 755 /var/www/backend/bootstrap/cache
-
-            echo "Backend Deployment complete!"
+            cd /var/www/superadmin
+            unzip -o output.zip
+            pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
