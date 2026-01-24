@@ -8,7 +8,6 @@ definePageMeta({
 })
 
 const loading = ref(false)
-const rowSelection = ref<Record<string, boolean>>({})
 
 const hasPermission = (_permission: string) => {
   return true
@@ -162,7 +161,6 @@ const filterInputs = computed<FilterInput[]>(() => [
 
 <template>
   <TableBase
-    v-model:row-selection="rowSelection"
     crud-route="tenants"
     crud-endpoint="/api/super-admin/tenants"
     class="w-full"

@@ -126,7 +126,14 @@ const buildAndEmitFilters = (newState: Record<string, unknown>) => {
 
     // If filter_key exists and is truthy, use filters[key] format
     if (filterConfig?.filter_key) {
-      activeFilters[`filters[${filterConfig.key}]`] = extractedValue
+      // For arrays (multiple select), format as filters[key][0], filters[key][1], etc.
+      if (Array.isArray(extractedValue)) {
+        extractedValue.forEach((item, index) => {
+          activeFilters[`filters[${filterConfig.key}][${index}]`] = item
+        })
+      } else {
+        activeFilters[`filters[${filterConfig.key}]`] = extractedValue
+      }
     } else {
       // Otherwise, put at root level (search)
       activeFilters[key] = extractedValue

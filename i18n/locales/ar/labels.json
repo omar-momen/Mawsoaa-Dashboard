@@ -25,6 +25,11 @@
   "search": "بحث",
   "user_details": "تفاصيل المستخدم",
   "roles": "الأدوار",
+  "role": "دور",
+  "permissions": "الصلاحيات",
+  "permission": "صلاحية",
+  "guard_name": "اسم الولي",
+  "label": "التسمية",
   "id_prefix": "#",
   "not_available": "-"
 }

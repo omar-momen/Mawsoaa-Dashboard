@@ -13,6 +13,7 @@ export interface CrudTableColumn {
   enableSorting?: boolean
   enableHiding?: boolean
   size?: number
+  limit?: number
 }
 
 export interface CrudTableColumnMeta {

@@ -101,7 +101,7 @@ const isSomeRowsSelected = computed(() => {
   return Object.values(rowSelection.value).some(Boolean) && !isAllRowsSelected.value
 })
 
-const rowSelection = defineModel<Record<string, boolean>>('rowSelection', { default: () => ({}) })
+const rowSelection = ref<Record<string, boolean>>({})
 const selectedRows = computed(() => {
   if (!props.selectable || Object.keys(rowSelection.value).length === 0) {
     return []

@@ -25,6 +25,11 @@
   "search": "Search",
   "user_details": "User Details",
   "roles": "Roles",
+  "role": "Role",
+  "permissions": "Permissions",
+  "permission": "Permission",
+  "guard_name": "Guard Name",
+  "label": "Label",
   "id_prefix": "#",
   "not_available": "-"
 }

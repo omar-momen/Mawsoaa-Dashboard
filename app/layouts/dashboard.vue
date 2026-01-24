@@ -52,6 +52,14 @@ const links = computed(() => [
       }
     },
     {
+      label: t('sidebar.links.roles'),
+      icon: 'i-lucide-shield',
+      to: localePath('/dashboard/roles'),
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
       label: t('sidebar.links.settings.title'),
       to: localePath('/dashboard/settings'),
       icon: 'i-lucide-settings',

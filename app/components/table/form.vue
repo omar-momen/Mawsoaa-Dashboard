@@ -367,7 +367,6 @@ const handleError = (event: { errors: FormError[] }) => {
             :required="input.required"
             :hint="input.hint"
           >
-            {{ state[input.key] }}
             <InputSelect
               v-if="input.getEndpoint"
               v-model="state[input.key] as Record<string, unknown> | Record<string, unknown>[] | null"

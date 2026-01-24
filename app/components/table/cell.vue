@@ -94,12 +94,30 @@ const formattedDate = computed(() => {
   return null
 })
 
-// Get chips array
+// Get chips array (with optional limit)
 const chipsArray = computed(() => {
   if (!isChips.value || !Array.isArray(cellValue.value)) {
     return []
   }
-  return cellValue.value as Array<{ id?: string | number, label: string }>
+  const allChips = cellValue.value as Array<{ id?: string | number, original_id?: number, label: string }>
+  const limit = props.column.limit
+  if (limit !== undefined && limit > 0) {
+    return allChips.slice(0, limit)
+  }
+  return allChips
+})
+
+// Get remaining chips count (when limit is applied)
+const remainingChipsCount = computed(() => {
+  if (!isChips.value || !Array.isArray(cellValue.value)) {
+    return 0
+  }
+  const limit = props.column.limit
+  if (limit !== undefined && limit > 0) {
+    const allChips = cellValue.value as Array<{ id?: string | number, original_id?: number, label: string }>
+    return Math.max(0, allChips.length - limit)
+  }
+  return 0
 })
 
 // Avatar modal state
@@ -154,11 +172,19 @@ const handleNameClick = () => {
       <template v-if="chipsArray.length > 0">
         <UBadge
           v-for="chip in chipsArray"
-          :key="chip.id"
+          :key="chip.id || chip.original_id"
           color="neutral"
           variant="soft"
         >
           {{ chip.label }}
+        </UBadge>
+        <UBadge
+          v-if="remainingChipsCount > 0"
+          color="success"
+          variant="soft"
+          class="cursor-default"
+        >
+          +{{ remainingChipsCount }} {{ t('labels.permission') }}
         </UBadge>
       </template>
       <span
