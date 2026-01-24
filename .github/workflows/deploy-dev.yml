@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # Upload full project (excluding node_modules via default .gitignore)
+      # Upload full project (node_modules excluded automatically by .gitignore)
       - name: Upload Project to Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -39,18 +39,18 @@ jobs:
             echo "🧹 Cleaning previous build output..."
             rm -rf .output
 
-            echo "📦 Installing production dependencies..."
-            pnpm install --prod --frozen-lockfile
+            echo "📦 Installing ALL dependencies..."
+            pnpm install --frozen-lockfile
 
             echo "⚙️ Building Nuxt project..."
             pnpm build
 
-            echo "🚀 Starting or restarting PM2 app..."
+            echo "🚀 Starting / Restarting PM2 app..."
             pm2 describe superadmin-dev > /dev/null 2>&1
             if [ $? -eq 0 ]; then
               pm2 restart superadmin-dev
             else
-              pm2 start .output/server/index.mjs --name="superadmin-dev"
+              pm2 start .output/server/index.mjs --name "superadmin-dev"
             fi
 
             echo "💾 Saving PM2 process list..."
