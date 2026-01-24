@@ -12,7 +12,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # Upload full project (node_modules excluded automatically by .gitignore)
       - name: Upload Project to Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -29,18 +28,20 @@ jobs:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
-          timeout: 20m
+          timeout: 30m
           script: |
             set -e
 
-            echo "🔧 Navigating to project directory..."
             cd /var/www/superadmin
 
-            echo "🧹 Cleaning previous build output..."
+            echo "🧹 Cleaning previous .output..."
             rm -rf .output
 
             echo "📦 Installing ALL dependencies..."
             pnpm install --frozen-lockfile
+
+            echo "🧠 Increasing Node memory limit..."
+            export NODE_OPTIONS="--max-old-space-size=3072"
 
             echo "⚙️ Building Nuxt project..."
             pnpm build
@@ -53,7 +54,4 @@ jobs:
               pm2 start .output/server/index.mjs --name "superadmin-dev"
             fi
 
-            echo "💾 Saving PM2 process list..."
             pm2 save
-
-            echo "🎉 Deployment completed successfully!"
