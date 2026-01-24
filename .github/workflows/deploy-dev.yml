@@ -2,51 +2,45 @@ name: Deploy Dev Frontend
 
 on:
   push:
-    branches:
-      - develop
+    branches: ["develop"]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+    - name: Install Dependencies
+      run: pnpm install
 
-      - name: Install dependencies
-        run: pnpm install
+    - name: Build
+      run: pnpm build
 
-      - name: Build Nuxt
-        run: pnpm run build
+    - name: Zip Output
+      run: zip -r output.zip .output
 
-      - name: Compress .output folder
-        run: zip -r output.zip .output
+    - name: Upload to Server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.DEV_HOST }}
+        username: ${{ secrets.DEV_USER }}
+        key: ${{ secrets.DEV_SSH_KEY }}
+        source: output.zip
+        target: /var/www/superadmin/
 
-      - name: Upload build to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.DEV_USER }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          source: output.zip
-          target: /var/www/superadmin/
-
-      - name: Restart PM2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.DEV_USER }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          script: |
-            cd /var/www/superadmin
-            unzip -o output.zip
-            pm2 restart superadmin-dev || pm2 start npm --name superadmin-dev -- run start -- -p 3001
+    - name: Restart PM2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DEV_HOST }}
+        username: ${{ secrets.DEV_USER }}
+        key: ${{ secrets.DEV_SSH_KEY }}
+        script: |
+          cd /var/www/superadmin
+          unzip -o output.zip
+          pm2 restart superadmin-dev || pm2 start .output/server/index.mjs --name "superadmin-dev"
